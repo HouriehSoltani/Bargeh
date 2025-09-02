@@ -32,14 +32,15 @@ const CourseDashboard = () => {
         left={0}
         right={0}
         bg="gray.100"
-        borderTop="1px"
-        borderColor="gray.200"
-        p={{ base: 3, md: 4 }}
+        borderTop="1px solid"
+        borderColor="gray.300"
+        p={{ base: 1, md: 2 }}
         zIndex={10}
         w="100%"
       >
         <HStack justify="flex-end" mx="auto" px={{ base: 4, md: 6 }}>
           <Button
+            bg={bgColor}
             variant="outline"
             colorScheme="blue"
             size={{ base: "sm", md: "md" }}

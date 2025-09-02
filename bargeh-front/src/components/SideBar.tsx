@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const SideBar = () => {
   const bgColor = useColorModeValue("gray.100", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.700");
+  const borderColor = useColorModeValue("gray.300", "gray.700");
   const textColor = useColorModeValue("gray.600", "gray.300");
   const navigate = useNavigate();
 
@@ -23,7 +23,7 @@ const SideBar = () => {
   return (
     <Box
       bg={bgColor}
-      borderRight="1px"
+      borderLeft="1px solid"
       borderColor={borderColor}
       h="100vh"
       p={4}
