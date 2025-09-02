@@ -1,5 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-family: 'Vazirmatn', system-ui, sans-serif;
+  direction: rtl;
+}
+
 body {
+  font-family: 'Vazirmatn', system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
   direction: rtl;
   text-align: right;
-  font-family: Vazirmatn, sans-serif;
 }
+
+/* Persian language support */
+[lang="fa"] {
+  direction: rtl;
+  text-align: right;
+}
+
+[lang="fa"] .chakra-button {
+  direction: rtl;
+}
+
+/* RTL support for Persian text */
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Ensure all elements inherit the font */
+* {
+  font-family: inherit;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+}
+
+/* Fix for fixed positioning elements */
+.fixed-element {
+  position: fixed;
+  z-index: 1000;
+}
+
+/* Ensure proper stacking context */
+#root {
+  position: relative;
+  z-index: 1;
+}
+

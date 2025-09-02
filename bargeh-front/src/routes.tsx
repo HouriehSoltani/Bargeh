@@ -7,12 +7,15 @@ import CoursePage from "./pages/CoursePage";
 
 const router = createBrowserRouter([
   {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
     path: "/",
     element: <Layout />,
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: "login", element: <LoginPage /> },
       { path: "courses", element: <CoursePage /> },
     ],
   },

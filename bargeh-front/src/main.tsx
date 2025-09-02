@@ -8,7 +8,7 @@ import router from "./routes.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Provider>
+    <Provider forcedTheme="light">
       <RouterProvider router={router} />
     </Provider>
   </StrictMode>

@@ -1,6 +1,6 @@
 import CourseDashboard from "@/components/CourseDashboard";
 import SideBar from "@/components/SideBar";
-import { Box, Grid, GridItem, Show } from "@chakra-ui/react";
+import { Grid, GridItem } from "@chakra-ui/react";
 
 const HomePage = () => {
   return (
@@ -10,15 +10,16 @@ const HomePage = () => {
         base: "1fr",
         md: "250px 1fr",
       }}
+      minH="100vh"
+      gap={0}
     >
+      {/* Sidebar */}
+      <GridItem area="aside" display={{ base: "none", md: "block" }}>
+        <SideBar />
+      </GridItem>
 
-      <Box display={{ base: "none", md: "block" }}>
-        <GridItem area="aside" paddingX={5} bg="blue">
-            <SideBar />
-          </GridItem>
-      </Box>
-
-      <GridItem area="main" bg="red">
+      {/* Main Content Area */}
+      <GridItem area="main">
         <CourseDashboard />
       </GridItem>
     </Grid>
