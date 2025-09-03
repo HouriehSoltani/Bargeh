@@ -1,12 +1,34 @@
-import { Box, Heading, VStack, HStack, Button, Icon } from "@chakra-ui/react";
+import { Box, Heading, VStack, HStack, Button, Icon, useDisclosure } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
 import CourseGrid from "./CourseGrid";
 import { sampleCourses } from "@/data/courses";
 import { FiFileText, FiPlus } from "react-icons/fi";
+import EnrollCourseDialog from "./EnrollCourseDialog";
+import CreateCourseDialog from "./CreateCourseDialog";
 
 const CourseDashboard = () => {
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
+  const enrollDialog = useDisclosure();
+  const createDialog = useDisclosure();
+
+  const handleEnrollSubmit = (values: { entryCode: string }) => {
+    // TODO: connect to API
+    console.log("Enroll submit", values);
+  };
+
+  const handleCreateSubmit = (values: {
+    courseNumber: string;
+    courseName: string;
+    description?: string;
+    term: string;
+    year: string;
+    department?: string;
+    allowEntryCode: boolean;
+  }) => {
+    // TODO: connect to API
+    console.log("Create course submit", values);
+  };
 
   return (
     <Box bg={bgColor} minH="100vh" p={6} position="relative" pb={24} fontFamily="inherit">
@@ -49,6 +71,7 @@ const CourseDashboard = () => {
             color="#4A90E2"
             _hover={{ bg: "#4A90E2", color: "white" }}
             fontSize={{ base: "xs", md: "sm" }}
+            onClick={enrollDialog.onOpen}
           >
             <Icon as={FiFileText} mr={2} />
             ثبت‌نام در دوره
@@ -60,12 +83,26 @@ const CourseDashboard = () => {
             paddingLeft={2}
             _hover={{ bg: "#1E4A9A" }}
             fontSize={{ base: "xs", md: "sm" }}
+            onClick={createDialog.onOpen}
           >
             <Icon as={FiPlus} mr={2} />
             ایجاد دوره
           </Button>
         </HStack>
       </Box>
+
+      <EnrollCourseDialog
+        open={enrollDialog.open}
+        setOpen={enrollDialog.setOpen}
+        onClose={enrollDialog.onClose}
+        onSubmit={handleEnrollSubmit}
+      />
+      <CreateCourseDialog
+        open={createDialog.open}
+        setOpen={createDialog.setOpen}
+        onClose={createDialog.onClose}
+        onSubmit={handleCreateSubmit}
+      />
     </Box>
   );
 };
