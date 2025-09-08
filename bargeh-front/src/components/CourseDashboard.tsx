@@ -1,23 +1,32 @@
-import { Box, Heading, VStack, HStack, Button, Icon, useDisclosure } from "@chakra-ui/react";
+import { Box, Heading, VStack, HStack, Button, Icon, useDisclosure, Spinner, Text } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
 import CourseGrid from "./CourseGrid";
-import { sampleCourses } from "@/data/courses";
 import { FiFileText, FiPlus } from "react-icons/fi";
 import EnrollCourseDialog from "./EnrollCourseDialog";
 import CreateCourseDialog from "./CreateCourseDialog";
+import { useCourses } from "@/hooks/useCourses";
+import { useAuth } from "@/hooks/useAuth";
 
 const CourseDashboard = () => {
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
   const enrollDialog = useDisclosure();
   const createDialog = useDisclosure();
+  
+  // API hooks
+  const { courses, isLoading, error, createCourse, enrollCourse, clearError } = useCourses();
+  const { isAuthenticated } = useAuth();
 
-  const handleEnrollSubmit = (values: { entryCode: string }) => {
-    // TODO: connect to API
-    console.log("Enroll submit", values);
+  const handleEnrollSubmit = async (values: { entryCode: string }) => {
+    try {
+      await enrollCourse(values);
+      enrollDialog.onClose();
+    } catch (error) {
+      console.error('Failed to enroll in course:', error);
+    }
   };
 
-  const handleCreateSubmit = (values: {
+  const handleCreateSubmit = async (values: {
     courseNumber: string;
     courseName: string;
     description?: string;
@@ -26,9 +35,48 @@ const CourseDashboard = () => {
     department?: string;
     allowEntryCode: boolean;
   }) => {
-    // TODO: connect to API
-    console.log("Create course submit", values);
+    try {
+      await createCourse(values);
+      createDialog.onClose();
+    } catch (error) {
+      console.error('Failed to create course:', error);
+    }
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <Box bg={bgColor} minH="100vh" p={6} display="flex" alignItems="center" justifyContent="center">
+        <VStack>
+          <Spinner size="xl" color="blue.500" />
+          <Heading size="md" color={textColor}>در حال بارگذاری دوره‌ها...</Heading>
+        </VStack>
+      </Box>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <Box bg={bgColor} minH="100vh" p={6}>
+        <Box bg="red.50" border="1px solid" borderColor="red.200" borderRadius="md" p={4} mb={4}>
+          <Text color="red.600" fontWeight="medium">{error}</Text>
+        </Box>
+        <Button onClick={clearError}>تلاش مجدد</Button>
+      </Box>
+    );
+  }
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <Box bg={bgColor} minH="100vh" p={6} display="flex" alignItems="center" justifyContent="center">
+        <VStack>
+          <Heading size="md" color={textColor}>لطفاً وارد شوید</Heading>
+        </VStack>
+      </Box>
+    );
+  }
 
   return (
     <Box bg={bgColor} minH="100vh" p={6} position="relative" pb={24} fontFamily="inherit">
@@ -45,7 +93,7 @@ const CourseDashboard = () => {
         </Heading>
       </VStack>
 
-      <CourseGrid courses={sampleCourses} />
+      <CourseGrid courses={courses} />
       
       {/* Bottom Action Bar */}
       <Box

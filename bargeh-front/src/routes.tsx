@@ -8,6 +8,7 @@ import AssignmentsPage from "./pages/course/AssignmentsPage";
 import RosterPage from "./pages/course/RosterPage";
 import ExtensionsPage from "./pages/course/ExtensionsPage";
 import SettingsPage from "./pages/course/SettingsPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
@@ -16,7 +17,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <Layout />,
+    element: (
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
+    ),
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <HomePage /> },

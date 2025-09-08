@@ -10,18 +10,41 @@ import {
   Container,
   Link,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiEye, FiEyeOff, FiMail } from "react-icons/fi";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { login, error, clearError, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", { email, password });
+    if (!email || !password) return;
+
+    try {
+      setIsSubmitting(true);
+      clearError();
+      await login({ username: email, password });
+      navigate('/');
+    } catch (error) {
+      console.error('Login failed:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -57,6 +80,13 @@ const LoginPage = () => {
               برای دسترسی به داشبورد دوره‌ها، لطفاً وارد شوید
             </Text>
           </VStack>
+
+          {/* Error Alert */}
+          {error && (
+            <Box bg="red.50" border="1px solid" borderColor="red.200" borderRadius="md" p={4} mb={4}>
+              <Text color="red.600" fontWeight="medium">{error}</Text>
+            </Box>
+          )}
 
           {/* Login Form */}
           <form onSubmit={handleSubmit}>
@@ -156,6 +186,9 @@ const LoginPage = () => {
                 fontFamily="inherit"
                 fontSize="md"
                 fontWeight="medium"
+                loading={isSubmitting}
+                loadingText="در حال ورود..."
+                disabled={!email || !password}
               >
                 ورود
               </Button>
