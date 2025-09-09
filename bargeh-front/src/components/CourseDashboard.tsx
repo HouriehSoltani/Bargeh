@@ -1,11 +1,12 @@
 import { Box, Heading, VStack, HStack, Button, Icon, useDisclosure, Spinner, Text } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
 import CourseGrid from "./CourseGrid";
-import { FiFileText, FiPlus } from "react-icons/fi";
+import { FiFileText, FiPlus, FiLogOut } from "react-icons/fi";
 import EnrollCourseDialog from "./EnrollCourseDialog";
 import CreateCourseDialog from "./CreateCourseDialog";
 import { useCourses } from "@/hooks/useCourses";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const CourseDashboard = () => {
   const bgColor = useColorModeValue("white", "gray.900");
@@ -15,7 +16,8 @@ const CourseDashboard = () => {
   
   // API hooks
   const { courses, isLoading, error, createCourse, enrollCourse, clearError } = useCourses();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleEnrollSubmit = async (values: { entryCode: string }) => {
     try {
@@ -40,6 +42,15 @@ const CourseDashboard = () => {
       createDialog.onClose();
     } catch (error) {
       console.error('Failed to create course:', error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
     }
   };
 
@@ -81,16 +92,28 @@ const CourseDashboard = () => {
   return (
     <Box bg={bgColor} minH="100vh" p={6} position="relative" pb={24} fontFamily="inherit">
       <VStack align="start" mb={8}>
-        <Heading 
-          size="xl" 
-          color={textColor} 
-          mb={4} 
-          fontWeight="bold"
-          fontFamily="inherit"
-          fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}
-        >
-          داشبورد دوره‌ها
-        </Heading>
+        <HStack justify="space-between" w="full" align="center">
+          <Heading 
+            size="xl" 
+            color={textColor} 
+            fontWeight="bold"
+            fontFamily="inherit"
+            fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}
+          >
+            داشبورد دوره‌ها
+          </Heading>
+          <Button
+            variant="outline"
+            size="sm"
+            color="#e53e3e"
+            borderColor="#e53e3e"
+            _hover={{ bg: "#e53e3e", color: "white" }}
+            onClick={handleLogout}
+          >
+            <Icon as={FiLogOut} mr={2} />
+            خروج
+          </Button>
+        </HStack>
       </VStack>
 
       <CourseGrid courses={courses} />

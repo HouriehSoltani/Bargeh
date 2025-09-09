@@ -1,27 +1,26 @@
 import {
   Box,
   VStack,
-  HStack,
   Input,
   Button,
   Heading,
   Text,
   IconButton,
   Container,
-  Link,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
-import { FiEye, FiEyeOff, FiMail } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiMail, FiUser } from "react-icons/fi";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { login, error, clearError, isAuthenticated } = useAuth();
+  const { register, error, clearError, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   // Redirect if already authenticated
@@ -33,15 +32,15 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) return;
+    if (!email || !name || !password) return;
 
     try {
       setIsSubmitting(true);
       clearError();
-      await login({ email, password });
+      await register({ email, name, password });
       navigate('/');
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('Registration failed:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -74,10 +73,10 @@ const LoginPage = () => {
               textAlign="center"
               fontFamily="inherit"
             >
-              ورود به سیستم
+              ثبت‌نام در سیستم
             </Heading>
             <Text color="gray.600" textAlign="center" fontSize="sm">
-              برای دسترسی به داشبورد دوره‌ها، لطفاً وارد شوید
+              برای دسترسی به داشبورد دوره‌ها، لطفاً ثبت‌نام کنید
             </Text>
           </VStack>
 
@@ -88,9 +87,41 @@ const LoginPage = () => {
             </Box>
           )}
 
-          {/* Login Form */}
+          {/* Registration Form */}
           <form onSubmit={handleSubmit}>
             <VStack gap={6}>
+              {/* Name Input */}
+              <Box w="100%">
+                <Text color="gray.600" fontSize="sm" fontWeight="medium" mb={2}>
+                  نام و نام خانوادگی
+                </Text>
+                <Box position="relative">
+                  <Input
+                    type="text"
+                    placeholder="نام و نام خانوادگی خود را وارد کنید"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    size="lg"
+                    borderColor="gray.200"
+                    _focus={{
+                      borderColor: "#4A90E2",
+                      boxShadow: "0 0 0 1px #4A90E2",
+                    }}
+                    _hover={{ borderColor: "#4A90E2" }}
+                    pr={12}
+                  />
+                  <Box
+                    position="absolute"
+                    right={3}
+                    top="50%"
+                    transform="translateY(-50%)"
+                    pointerEvents="none"
+                  >
+                    <FiUser color="#4A90E2" />
+                  </Box>
+                </Box>
+              </Box>
+
               {/* Email Input */}
               <Box w="100%">
                 <Text color="gray.600" fontSize="sm" fontWeight="medium" mb={2}>
@@ -163,18 +194,7 @@ const LoginPage = () => {
                 </Box>
               </Box>
 
-              {/* Forgot Password */}
-              <HStack justify="flex-end" w="full">
-                <Link
-                  color="#4A90E2"
-                  fontSize="sm"
-                  _hover={{ textDecoration: "underline" }}
-                >
-                  فراموشی رمز عبور؟
-                </Link>
-              </HStack>
-
-              {/* Login Button */}
+              {/* Register Button */}
               <Button
                 type="submit"
                 size="lg"
@@ -187,10 +207,10 @@ const LoginPage = () => {
                 fontSize="md"
                 fontWeight="medium"
                 loading={isSubmitting}
-                loadingText="در حال ورود..."
-                disabled={!email || !password}
+                loadingText="در حال ثبت‌نام..."
+                disabled={!email || !name || !password}
               >
-                ورود
+                ثبت‌نام
               </Button>
             </VStack>
           </form>
@@ -198,10 +218,10 @@ const LoginPage = () => {
           {/* Divider */}
           <Box my={6} borderTop="1px" borderColor="gray.200" />
 
-          {/* Additional Options */}
+          {/* Login Link */}
           <VStack gap={4}>
             <Text color="gray.600" fontSize="sm" textAlign="center">
-              حساب کاربری ندارید؟
+              قبلاً ثبت‌نام کرده‌اید؟
             </Text>
             <Button
               variant="outline"
@@ -211,9 +231,9 @@ const LoginPage = () => {
               color="#4A90E2"
               _hover={{ bg: "#4A90E2", color: "white" }}
               fontFamily="inherit"
-              onClick={() => navigate('/register')}
+              onClick={() => navigate('/login')}
             >
-              ثبت‌نام
+              ورود
             </Button>
           </VStack>
         </Box>
@@ -222,4 +242,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;

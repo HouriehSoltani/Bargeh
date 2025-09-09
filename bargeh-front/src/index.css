@@ -9,6 +9,13 @@
 html {
   font-family: 'Vazirmatn', system-ui, sans-serif;
   direction: rtl;
+  color-scheme: light;
+}
+
+/* Force light theme */
+html, body {
+  background-color: white !important;
+  color: black !important;
 }
 
 body {

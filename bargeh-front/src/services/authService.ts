@@ -3,13 +3,13 @@ import { API_CONFIG } from '@/config/api';
 
 // Authentication types
 export interface LoginRequest {
-  username: string;
+  email: string;
   password: string;
 }
 
 export interface RegisterRequest {
-  username: string;
   email: string;
+  name: string;
   password: string;
   first_name?: string;
   last_name?: string;
@@ -23,8 +23,8 @@ export interface AuthResponse {
 
 export interface UserProfile {
   id: number;
-  username: string;
   email: string;
+  name: string;
   first_name: string;
   last_name: string;
   date_joined: string;
@@ -45,20 +45,21 @@ export const authService = {
   },
 
   // Register new user
-  register: async (userData: RegisterRequest): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>(API_CONFIG.ENDPOINTS.REGISTER, userData);
-    
-    // Store tokens in localStorage
-    localStorage.setItem('access_token', response.access);
-    localStorage.setItem('refresh_token', response.refresh);
-    
+  register: async (userData: RegisterRequest): Promise<{ id: number; email: string; name: string }> => {
+    const response = await api.post<{ id: number; email: string; name: string }>(API_CONFIG.ENDPOINTS.REGISTER, userData);
     return response;
   },
 
   // Logout user
   logout: async (): Promise<void> => {
+    const refreshToken = localStorage.getItem('refresh_token');
+    
     try {
-      await api.post(API_CONFIG.ENDPOINTS.LOGOUT);
+      if (refreshToken) {
+        await api.post(API_CONFIG.ENDPOINTS.LOGOUT, {
+          refresh: refreshToken
+        });
+      }
     } catch {
       // Even if logout fails on server, clear local tokens
       console.warn('Logout request failed, but clearing local tokens');
@@ -72,6 +73,11 @@ export const authService = {
   // Get user profile
   getProfile: async (): Promise<UserProfile> => {
     return api.get<UserProfile>(API_CONFIG.ENDPOINTS.PROFILE);
+  },
+
+  // Get current user info
+  getMe: async (): Promise<{ id: number; email: string; name: string }> => {
+    return api.get<{ id: number; email: string; name: string }>(API_CONFIG.ENDPOINTS.ME);
   },
 
   // Update user profile
