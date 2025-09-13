@@ -7,7 +7,11 @@ import {
 import { useColorModeValue } from "@/hooks/useColorMode";
 import { FiPlus } from "react-icons/fi";
 
-const CreateCourseCard = () => {
+interface CreateCourseCardProps {
+  onClick?: () => void;
+}
+
+const CreateCourseCard = ({ onClick }: CreateCourseCardProps) => {
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.300", "gray.600");
   const textColor = useColorModeValue("gray.600", "gray.300");
@@ -20,7 +24,7 @@ const CreateCourseCard = () => {
       borderRadius="lg"
       overflow="hidden"
       cursor="pointer"
-      height="280px"
+      height={{ base: "200px", md: "220px" }}
       display="flex"
       flexDirection="column"
       justifyContent="center"
@@ -31,10 +35,11 @@ const CreateCourseCard = () => {
         shadow: "md"
       }}
       transition="all 0.3s"
+      onClick={onClick}
     >
       <VStack align="center">
-        <Icon as={FiPlus} boxSize={8} color={textColor} mb={2} />
-        <Text color={textColor} fontSize="lg" fontWeight="medium" textAlign="center">
+        <Icon as={FiPlus} boxSize={6} color={textColor} mb={2} />
+        <Text color={textColor} fontSize={{ base: "sm", md: "md" }} fontWeight="medium" textAlign="center">
           ایجاد دوره جدید
         </Text>
       </VStack>

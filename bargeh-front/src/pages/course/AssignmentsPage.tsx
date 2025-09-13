@@ -1,9 +1,11 @@
-import CourseSideBar from "@/components/CourseSideBar";
+import DynamicSidebar from "@/components/DynamicSidebar";
 import { Box, Grid, GridItem, Heading, Text, VStack, Button, Icon } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
 import { FiPlus } from "react-icons/fi";
+import { useParams } from "react-router-dom";
 
 const AssignmentsPage = () => {
+  const { courseId } = useParams<{ courseId: string }>();
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
   const subtleText = useColorModeValue("gray.600", "gray.300");
@@ -16,13 +18,15 @@ const AssignmentsPage = () => {
       gap={0}
     >
       <GridItem area="aside" display={{ base: "none", md: "block" }}>
-        <CourseSideBar />
+        <DynamicSidebar />
       </GridItem>
 
       <GridItem area="main">
         <Box bg={bgColor} minH="100vh" p={{ base: 4, md: 6 }}>
           <VStack align="stretch" gap={6}>
-            <Heading size="xl" color={textColor}>تمرین‌ها</Heading>
+            <Heading size="xl" color={textColor}>
+              تمرین‌ها {courseId && `- دوره ${courseId}`}
+            </Heading>
             
             <Box
               borderWidth="1px"

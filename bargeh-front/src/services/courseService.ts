@@ -4,13 +4,9 @@ import type { Course } from '@/components/CourseCard';
 
 // Types for API requests and responses
 export interface CreateCourseRequest {
-  courseNumber: string;
-  courseName: string;
+  title: string;
+  code: string;
   description?: string;
-  term: string;
-  year: string;
-  department?: string;
-  allowEntryCode: boolean;
 }
 
 export interface EnrollCourseRequest {

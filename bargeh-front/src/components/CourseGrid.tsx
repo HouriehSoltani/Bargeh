@@ -3,32 +3,24 @@ import CourseCard from "./CourseCard";
 import CreateCourseCard from "./CreateCourseCard";
 import type { Course } from "./CourseCard";
 import { FiChevronDown } from "react-icons/fi";
+import { groupCoursesByPersianTerm, getSortedPersianTerms } from "@/utils/persianDate";
 
 interface CourseGridProps {
   courses: Course[];
+  onCreateCourse?: () => void;
 }
 
-const CourseGrid = ({ courses }: CourseGridProps) => {
-  // Group courses by term
-  const coursesByTerm = courses.reduce((acc, course) => {
-    if (!acc[course.term]) {
-      acc[course.term] = [];
-    }
-    acc[course.term].push(course);
-    return acc;
-  }, {} as Record<string, Course[]>);
-
-  const sortedTerms = Object.keys(coursesByTerm).sort((a, b) => {
-    const termOrder = { "Fall 2024": 1, "Spring 2024": 2, "Winter 2024": 3 };
-    return (termOrder[a as keyof typeof termOrder] || 999) - (termOrder[b as keyof typeof termOrder] || 999);
-  });
+const CourseGrid = ({ courses, onCreateCourse }: CourseGridProps) => {
+  // Group courses by Persian season-year
+  const coursesByPersianTerm = groupCoursesByPersianTerm(courses);
+  const sortedPersianTerms = getSortedPersianTerms(coursesByPersianTerm);
 
   return (
     <VStack align="start" width="100%">
-      {sortedTerms.map((term) => (
-        <Box key={term} width="100%" mb={8}>
-          <Heading size="lg" mb={4} color="gray.700">
-            {term}
+      {sortedPersianTerms.map((persianTerm) => (
+        <Box key={persianTerm} width="100%" mb={8}>
+          <Heading size="lg" mb={4} color="gray.700" fontFamily="inherit">
+            {persianTerm}
           </Heading>
           <Grid
             templateColumns={{
@@ -39,14 +31,15 @@ const CourseGrid = ({ courses }: CourseGridProps) => {
             }}
             gap={6}
           >
-            {coursesByTerm[term].map((course) => (
+            {coursesByPersianTerm[persianTerm].map((course) => (
               <GridItem key={course.id}>
                 <CourseCard course={course} />
               </GridItem>
             ))}
-            {term === "Fall 2024" && (
+            {/* Show create course card in the most recent term */}
+            {persianTerm === sortedPersianTerms[0] && (
               <GridItem>
-                <CreateCourseCard />
+                <CreateCourseCard onClick={onCreateCourse} />
               </GridItem>
             )}
           </Grid>

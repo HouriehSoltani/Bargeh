@@ -1,12 +1,12 @@
 import { Box, Heading, VStack, HStack, Button, Icon, useDisclosure, Spinner, Text } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
 import CourseGrid from "./CourseGrid";
-import { FiFileText, FiPlus, FiLogOut } from "react-icons/fi";
-import EnrollCourseDialog from "./EnrollCourseDialog";
-import CreateCourseDialog from "./CreateCourseDialog";
+import { FiFileText, FiPlus } from "react-icons/fi";
+import EnrollCoursePopup from "./EnrollCoursePopup";
+import CreateCoursePopup from "./CreateCoursePopup";
 import { useCourses } from "@/hooks/useCourses";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom"; // Commented out since authentication is bypassed
 
 const CourseDashboard = () => {
   const bgColor = useColorModeValue("white", "gray.900");
@@ -16,8 +16,8 @@ const CourseDashboard = () => {
   
   // API hooks
   const { courses, isLoading, error, createCourse, enrollCourse, clearError } = useCourses();
-  const { isAuthenticated, logout } = useAuth();
-  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  // const navigate = useNavigate(); // Commented out since authentication is bypassed
 
   const handleEnrollSubmit = async (values: { entryCode: string }) => {
     try {
@@ -29,13 +29,9 @@ const CourseDashboard = () => {
   };
 
   const handleCreateSubmit = async (values: {
-    courseNumber: string;
-    courseName: string;
+    title: string;
+    code: string;
     description?: string;
-    term: string;
-    year: string;
-    department?: string;
-    allowEntryCode: boolean;
   }) => {
     try {
       await createCourse(values);
@@ -45,14 +41,15 @@ const CourseDashboard = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
+  // Logout function commented out since authentication is bypassed
+  // const handleLogout = async () => {
+  //   try {
+  //     await logout();
+  //     navigate('/login');
+  //   } catch (error) {
+  //     console.error('Logout failed:', error);
+  //   }
+  // };
 
   // Show loading state
   if (isLoading) {
@@ -92,7 +89,7 @@ const CourseDashboard = () => {
   return (
     <Box bg={bgColor} minH="100vh" p={6} position="relative" pb={24} fontFamily="inherit">
       <VStack align="start" mb={8}>
-        <HStack justify="space-between" w="full" align="center">
+
           <Heading 
             size="xl" 
             color={textColor} 
@@ -102,21 +99,9 @@ const CourseDashboard = () => {
           >
             داشبورد دوره‌ها
           </Heading>
-          <Button
-            variant="outline"
-            size="sm"
-            color="#e53e3e"
-            borderColor="#e53e3e"
-            _hover={{ bg: "#e53e3e", color: "white" }}
-            onClick={handleLogout}
-          >
-            <Icon as={FiLogOut} mr={2} />
-            خروج
-          </Button>
-        </HStack>
       </VStack>
 
-      <CourseGrid courses={courses} />
+      <CourseGrid courses={courses} onCreateCourse={createDialog.onOpen} />
       
       {/* Bottom Action Bar */}
       <Box
@@ -162,15 +147,13 @@ const CourseDashboard = () => {
         </HStack>
       </Box>
 
-      <EnrollCourseDialog
-        open={enrollDialog.open}
-        setOpen={enrollDialog.setOpen}
+      <EnrollCoursePopup
+        isOpen={enrollDialog.open}
         onClose={enrollDialog.onClose}
         onSubmit={handleEnrollSubmit}
       />
-      <CreateCourseDialog
-        open={createDialog.open}
-        setOpen={createDialog.setOpen}
+      <CreateCoursePopup
+        isOpen={createDialog.open}
         onClose={createDialog.onClose}
         onSubmit={handleCreateSubmit}
       />

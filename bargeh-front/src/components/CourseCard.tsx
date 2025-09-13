@@ -7,7 +7,8 @@ import {
   Icon,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
-import { FiBook, FiClock, FiFileText } from "react-icons/fi";
+import { FiBook, FiFileText } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 export interface Course {
   id: number;
@@ -35,17 +36,13 @@ const CourseCard = ({ course }: CourseCardProps) => {
   const cardBg = useColorModeValue("gray.100", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const textColor = useColorModeValue("gray.600", "gray.300");
+  const navigate = useNavigate();
 
-
-  // Persian term mapping
-  const getPersianTerm = (term: string): string => {
-    const termMap: Record<string, string> = {
-      'Fall 2024': 'پاییز ۱۴۰۳',
-      'Spring 2024': 'بهار ۱۴۰۴',
-      'Winter 2024': 'زمستان ۱۴۰۳',
-    };
-    return termMap[term] || term;
+  const handleCourseClick = () => {
+    navigate(`/courses/${course.id}/assignments`);
   };
+
+
 
   return (
     <Box
@@ -58,21 +55,22 @@ const CourseCard = ({ course }: CourseCardProps) => {
       _hover={{ transform: "translateY(-4px)", shadow: "lg" }}
       transition="all 0.3s"
       cursor="pointer"
-      height={{ base: "260px", md: "280px" }}
+      height={{ base: "200px", md: "220px" }}
       display="flex"
       flexDirection="column"
       fontFamily="inherit"
+      onClick={handleCourseClick}
     >
       <Box p={{ base: 3, md: 4 }} flex="1">
-        <VStack align="start" mb={4} gap={{ base: 2, md: 3 }}>
+        <VStack align="start" mb={3} gap={2}>
           <Heading 
             size="md" 
-            fontSize={{ base: "sm", md: "lg" }} 
+            fontSize={{ base: "sm", md: "md" }} 
             fontWeight="bold" 
-            mb={{ base: 2, md: 3 }}
             fontFamily="inherit"
+            lineHeight="1.3"
           >
-            {course.courseCode}
+            {course.title}
           </Heading>
           <Text 
             color={textColor} 
@@ -80,18 +78,14 @@ const CourseCard = ({ course }: CourseCardProps) => {
             fontFamily="inherit"
             lineHeight="1.4"
           >
-            {course.title}
+            {course.courseCode}
           </Text>
         </VStack>
 
-        <VStack align="start" mb={4} gap={{ base: 1, md: 2 }}>
-          <HStack color={textColor} fontSize={{ base: "xs", md: "sm" }} mb={2}>
+        <VStack align="start" gap={1}>
+          <HStack color={textColor} fontSize={{ base: "xs", md: "sm" }}>
             <Icon as={FiBook} />
             <Text fontFamily="inherit">{course.instructor}</Text>
-          </HStack>
-          <HStack color={textColor} fontSize={{ base: "xs", md: "sm" }}>
-            <Icon as={FiClock} />
-            <Text fontFamily="inherit">{getPersianTerm(course.term)}</Text>
           </HStack>
         </VStack>
       </Box>

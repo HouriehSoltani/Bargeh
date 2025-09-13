@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { type LoginRequest, type RegisterRequest, type UserProfile } from '@/services/authService';
 
 interface UseAuthReturn {
@@ -14,12 +14,12 @@ interface UseAuthReturn {
 }
 
 export const useAuth = (): UseAuthReturn => {
-  // AUTHENTICATION BYPASSED FOR DEVELOPMENT
+  // AUTHENTICATION DISABLED - No authentication required
   const [user] = useState<UserProfile | null>({
     id: 1,
-    email: "dev@example.com",
-    name: "Development User",
-    first_name: "Dev",
+    email: "user@example.com",
+    name: "Demo User",
+    first_name: "Demo",
     last_name: "User",
     date_joined: new Date().toISOString(),
     last_login: new Date().toISOString(),
@@ -27,8 +27,14 @@ export const useAuth = (): UseAuthReturn => {
   const [isLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Always return authenticated for development
+  // Always return authenticated (no auth required)
   const isAuthenticated = true;
+
+  // Clear any existing tokens
+  React.useEffect(() => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+  }, []);
 
   // Load user profile on mount - BYPASSED FOR DEVELOPMENT
   // useEffect(() => {
@@ -55,27 +61,23 @@ export const useAuth = (): UseAuthReturn => {
   //   loadUserProfile();
   // }, [isAuthenticated]);
 
-  const login = useCallback(async (credentials: LoginRequest) => {
+  const login = useCallback(async (_credentials: LoginRequest) => {
     // BYPASSED FOR DEVELOPMENT - just return success
-    console.log('Login bypassed for development:', credentials);
     return Promise.resolve();
   }, []);
 
-  const register = useCallback(async (userData: RegisterRequest) => {
+  const register = useCallback(async (_userData: RegisterRequest) => {
     // BYPASSED FOR DEVELOPMENT - just return success
-    console.log('Register bypassed for development:', userData);
     return Promise.resolve();
   }, []);
 
   const logout = useCallback(async () => {
     // BYPASSED FOR DEVELOPMENT - just log
-    console.log('Logout bypassed for development');
     return Promise.resolve();
   }, []);
 
-  const updateProfile = useCallback(async (profileData: Partial<UserProfile>) => {
+  const updateProfile = useCallback(async (_profileData: Partial<UserProfile>) => {
     // BYPASSED FOR DEVELOPMENT - just log
-    console.log('Update profile bypassed for development:', profileData);
     return Promise.resolve();
   }, []);
 

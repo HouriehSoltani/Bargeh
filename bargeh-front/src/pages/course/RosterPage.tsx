@@ -1,4 +1,4 @@
-import CourseSideBar from "@/components/CourseSideBar";
+import DynamicSidebar from "@/components/DynamicSidebar";
 import { Box, Grid, GridItem, Heading, Text, VStack, Button, Icon } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
 import { FiUserPlus } from "react-icons/fi";
@@ -16,7 +16,7 @@ const RosterPage = () => {
       gap={0}
     >
       <GridItem area="aside" display={{ base: "none", md: "block" }}>
-        <CourseSideBar />
+        <DynamicSidebar />
       </GridItem>
 
       <GridItem area="main">

@@ -11,7 +11,7 @@ export const API_CONFIG = {
     LOGIN: '/api/users/auth/login/',
     LOGOUT: '/api/users/auth/logout/',
     REGISTER: '/api/users/auth/register/',
-    REFRESH: '/api/auth/refresh/',
+    REFRESH: '/api/users/auth/refresh/',
     PROFILE: '/api/users/profile/',
     ME: '/api/users/me/',
     
@@ -19,7 +19,7 @@ export const API_CONFIG = {
     COURSES: '/api/courses/',
     COURSE_DETAIL: (id: number) => `/api/courses/${id}/`,
     ENROLL_COURSE: '/api/courses/enroll/',
-    CREATE_COURSE: '/api/courses/create/',
+    CREATE_COURSE: '/api/courses/',
     
     // Assignments
     ASSIGNMENTS: (courseId: number) => `/api/courses/${courseId}/assignments/`,
