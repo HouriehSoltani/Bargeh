@@ -7,7 +7,7 @@ import {
   Icon,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
-import { FiBook, FiFileText } from "react-icons/fi";
+import { FiBook, FiFileText, FiUsers } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
 export interface Course {
@@ -26,6 +26,7 @@ export interface Course {
   enrolled: boolean;
   assignments: number;
   term: string;
+  year: number;
 }
 
 interface CourseCardProps {
@@ -86,6 +87,10 @@ const CourseCard = ({ course }: CourseCardProps) => {
           <HStack color={textColor} fontSize={{ base: "xs", md: "sm" }}>
             <Icon as={FiBook} />
             <Text fontFamily="inherit">{course.instructor}</Text>
+          </HStack>
+          <HStack color={textColor} fontSize={{ base: "xs", md: "sm" }}>
+            <Icon as={FiUsers} />
+            <Text fontFamily="inherit">{course.students} دانشجو</Text>
           </HStack>
         </VStack>
       </Box>

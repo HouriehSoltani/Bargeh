@@ -32,6 +32,8 @@ const CourseDashboard = () => {
     title: string;
     code: string;
     description?: string;
+    term?: string;
+    year?: number;
   }) => {
     try {
       await createCourse(values);

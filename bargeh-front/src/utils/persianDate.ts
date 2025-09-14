@@ -98,3 +98,63 @@ export function getSortedPersianTerms(groupedCourses: Record<string, any[]>): st
     return bSortKey - aSortKey; // Descending order (most recent first)
   });
 }
+
+/**
+ * Groups courses by term and year from database fields
+ * @param courses - Array of courses with term and year properties
+ * @returns Object with term-year as keys and courses as values
+ */
+export function groupCoursesByTermYear(courses: any[]): Record<string, any[]> {
+  const grouped: Record<string, any[]> = {};
+
+  courses.forEach(course => {
+    const term = course.term || 'نامشخص';
+    const year = course.year || 1400;
+    const key = `${term} ${year}`;
+
+    if (!grouped[key]) {
+      grouped[key] = [];
+    }
+    grouped[key].push(course);
+  });
+
+  return grouped;
+}
+
+/**
+ * Gets sorted term-year groups (most recent first)
+ * @param groupedCourses - Object with term-year as keys
+ * @returns Array of term-year keys sorted by recency
+ */
+export function getSortedTermYearGroups(groupedCourses: Record<string, any[]>): string[] {
+  return Object.keys(groupedCourses).sort((a, b) => {
+    // Parse term and year from keys like "بهار 1404"
+    const parseTermYear = (key: string) => {
+      const parts = key.split(' ');
+      const term = parts[0] || '';
+      const year = parseInt(parts[1]) || 0;
+      
+      // Season order: پاییز=4, زمستان=3, تابستان=2, بهار=1
+      const seasonOrder: Record<string, number> = { 
+        'پاییز': 4, 'زمستان': 3, 'تابستان': 2, 'بهار': 1, 'نامشخص': 0 
+      };
+      const seasonWeight = seasonOrder[term] || 0;
+      
+      return (year * 10) + seasonWeight;
+    };
+
+    const aSortKey = parseTermYear(a);
+    const bSortKey = parseTermYear(b);
+    return bSortKey - aSortKey; // Descending order (most recent first)
+  });
+}
+
+/**
+ * Filters courses by year threshold
+ * @param courses - Array of courses
+ * @param minYear - Minimum year to include (inclusive)
+ * @returns Filtered array of courses
+ */
+export function filterCoursesByYear(courses: any[], minYear: number): any[] {
+  return courses.filter(course => (course.year || 0) >= minYear);
+}

@@ -7,6 +7,8 @@ export interface CreateCourseRequest {
   title: string;
   code: string;
   description?: string;
+  term?: string;
+  year?: number;
 }
 
 export interface EnrollCourseRequest {
