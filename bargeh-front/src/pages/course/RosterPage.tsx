@@ -1,12 +1,40 @@
 import DynamicSidebar from "@/components/DynamicSidebar";
-import { Box, Grid, GridItem, Heading, Text, VStack, Button, Icon } from "@chakra-ui/react";
+import { Box, Grid, GridItem, Heading, Text, VStack, Button, Icon, Spinner, HStack } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
 import { FiUserPlus } from "react-icons/fi";
+import { useParams } from "react-router-dom";
+import { useCourse } from "@/hooks/useCourse";
 
 const RosterPage = () => {
+  const { courseId } = useParams<{ courseId: string }>();
+  const { course, isLoading, error } = useCourse(courseId);
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
   const subtleText = useColorModeValue("gray.600", "gray.300");
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <Box bg={bgColor} minH="100vh" p={6} display="flex" alignItems="center" justifyContent="center">
+        <VStack>
+          <Spinner size="xl" color="blue.500" />
+          <Text color={textColor}>در حال بارگذاری درس...</Text>
+        </VStack>
+      </Box>
+    );
+  }
+
+  // Show error state
+  if (error || !course) {
+    return (
+      <Box bg={bgColor} minH="100vh" p={6} display="flex" alignItems="center" justifyContent="center">
+        <VStack>
+          <Text color="red.500" fontSize="lg">خطا در بارگذاری درس</Text>
+          <Text color={subtleText}>{error || 'درس یافت نشد'}</Text>
+        </VStack>
+      </Box>
+    );
+  }
 
   return (
     <Grid
@@ -16,13 +44,34 @@ const RosterPage = () => {
       gap={0}
     >
       <GridItem area="aside" display={{ base: "none", md: "block" }}>
-        <DynamicSidebar />
+        <DynamicSidebar 
+          courseTitle={course.title}
+          courseSubtitle={`${course.term} ${course.year}`}
+          instructor={course.instructor}
+          courseId={courseId}
+        />
       </GridItem>
 
       <GridItem area="main">
         <Box bg={bgColor} minH="100vh" p={{ base: 4, md: 6 }}>
           <VStack align="stretch" gap={6}>
-            <Heading size="xl" color={textColor}>لیست دانشجویان</Heading>
+            {/* Course Header */}
+            <Box>
+              <HStack align='center' gap={3} mb={2}>
+                <Heading size="xl" color={textColor} fontWeight="bold">
+                  {course.title}
+                </Heading>
+                <Box height="20px" width="1px" bg={subtleText} />
+                <Text color={subtleText} fontSize="lg">
+                  {course.term} {course.year}
+                </Text>
+              </HStack>
+              <Text color={subtleText} fontSize="sm">
+                شماره درس: {course.courseCode}
+              </Text>
+            </Box>
+            
+            <Heading size="lg" color={textColor}>لیست دانشجویان</Heading>
             
             <Box
               borderWidth="1px"

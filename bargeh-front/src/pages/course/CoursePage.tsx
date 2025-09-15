@@ -18,7 +18,7 @@ import { FiPlus, FiChevronUp, FiChevronDown, FiMoreVertical, FiCircle } from "re
 import { useParams } from "react-router-dom";
 import { useCourse } from "@/hooks/useCourse";
 
-const AssignmentsPage = () => {
+const CoursePage = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const { course, isLoading, error } = useCourse(courseId);
   const bgColor = useColorModeValue("white", "gray.900");
@@ -84,7 +84,18 @@ const AssignmentsPage = () => {
               </Text>
             </Box>
 
-            {/* Assignments Table */}
+            {/* Description Section */}
+            <Box width="50%">
+              <Heading size="md" color={textColor} mb={2}>
+                توضیحات
+            </Heading>
+              <Box height="2px" width="100%" bg='gray.400' mb={3} />
+              <Text color={textColor} fontSize="sm">
+                {course.description || "توضیحات درس را در صفحه تنظیمات درس ویرایش کنید."}
+              </Text>
+            </Box>
+            
+            {/* Active Assignments Table */}
             <VStack align="stretch" gap={4}>
               <Box
                 borderWidth="1px"
@@ -208,4 +219,4 @@ const AssignmentsPage = () => {
   );
 };
 
-export default AssignmentsPage;
+export default CoursePage;
