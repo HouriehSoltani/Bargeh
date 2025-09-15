@@ -76,7 +76,7 @@ const RegisterPage = () => {
               ثبت‌نام در سیستم
             </Heading>
             <Text color="gray.600" textAlign="center" fontSize="sm">
-              برای دسترسی به داشبورد دوره‌ها، لطفاً ثبت‌نام کنید
+              برای دسترسی به داشبورد درس‌ها، لطفاً ثبت‌نام کنید
             </Text>
           </VStack>
 

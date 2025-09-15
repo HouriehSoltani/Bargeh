@@ -67,7 +67,7 @@ const CourseGrid = ({ courses, onCreateCourse }: CourseGridProps) => {
           >
             <HStack>
               <Icon as={showOlderCourses ? FiChevronUp : FiChevronDown} />
-              <span>{showOlderCourses ? 'مخفی کردن دوره‌های قدیمی‌تر' : 'نمایش دوره‌های قدیمی‌تر'}</span>
+              <span>{showOlderCourses ? 'مخفی کردن درس‌های قدیمی‌تر' : 'نمایش درس‌های قدیمی‌تر'}</span>
             </HStack>
           </Button>
         </Box>

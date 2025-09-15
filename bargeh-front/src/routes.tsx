@@ -31,11 +31,11 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: "courses", element: <CoursePage /> },
+      { path: "courses/:courseId", element: <CoursePage /> },
       { path: "courses/:courseId/assignments", element: <AssignmentsPage /> },
-      { path: "courses/assignments", element: <AssignmentsPage /> },
-      { path: "courses/roster", element: <RosterPage /> },
-      { path: "courses/extensions", element: <ExtensionsPage /> },
-      { path: "courses/settings", element: <SettingsPage /> },
+      { path: "courses/:courseId/roster", element: <RosterPage /> },
+      { path: "courses/:courseId/extensions", element: <ExtensionsPage /> },
+      { path: "courses/:courseId/settings", element: <SettingsPage /> },
     ],
   },
 ]);

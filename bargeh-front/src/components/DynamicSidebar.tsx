@@ -9,14 +9,16 @@ interface DynamicSidebarProps {
   config?: SidebarConfig;
   courseTitle?: string;
   courseSubtitle?: string;
-  instructors?: string[];
+  instructor?: string;
+  courseId?: string;
 }
 
 const DynamicSidebar = ({ 
   config, 
   courseTitle, 
-  courseSubtitle, 
-  instructors 
+  courseSubtitle: _courseSubtitle, 
+  instructor,
+  courseId
 }: DynamicSidebarProps) => {
   const bgColor = useColorModeValue("gray.100", "gray.800");
   const borderColor = useColorModeValue("gray.300", "gray.700");
@@ -28,9 +30,25 @@ const DynamicSidebar = ({
   const { user, isAuthenticated, logout } = useAuth();
 
   // Get navigation config based on current path if not provided
-  const navigationConfig = config || getNavigationConfig(location.pathname);
+  const navigationConfig = config || getNavigationConfig(location.pathname, courseId);
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => {
+    // Handle exact matches
+    if (location.pathname === path) return true;
+    
+    // Handle course-specific routes (e.g., /courses/3/assignments should match /courses/assignments)
+    if (path.startsWith('/courses/') && location.pathname.startsWith('/courses/')) {
+      const pathParts = path.split('/');
+      const locationParts = location.pathname.split('/');
+      
+      // If the last part of both paths match (e.g., 'assignments')
+      if (pathParts.length >= 3 && locationParts.length >= 3) {
+        return pathParts[pathParts.length - 1] === locationParts[locationParts.length - 1];
+      }
+    }
+    
+    return false;
+  };
 
   const handleLogin = () => {
     navigate('/login');
@@ -65,7 +83,7 @@ const DynamicSidebar = ({
     >
       <VStack gap={6} align="stretch">
         {/* User Info (if authenticated and on home page) */}
-        {isAuthenticated && user && navigationConfig.type === 'home' && (
+        {isAuthenticated && user && (
           <Box p={3} bg="white" borderRadius="md" border="1px solid" borderColor={borderColor}>
             <HStack gap={3}>
               <Box 
@@ -96,14 +114,9 @@ const DynamicSidebar = ({
 
         {/* Course Info (if on course page) */}
         {navigationConfig.type === 'course' && (
-          <VStack align="stretch" gap={2}>
-            <Heading size="sm" color={textColor}>
+            <Heading size="lg" color={textColor} fontWeight="bold">
               {courseTitle || navigationConfig.title}
             </Heading>
-            <Text fontSize="sm" color={textColor} textAlign="center">
-              {courseSubtitle || navigationConfig.subtitle}
-            </Text>
-          </VStack>
         )}
 
         {/* Navigation Sections */}
@@ -125,7 +138,7 @@ const DynamicSidebar = ({
                   transform: "translateX(-4px)"
                 }}
                 fontSize="sm"
-                h="40px"
+                h="30px"
                 transition="all 0.3s"
                 onClick={() => handleNavigation(item.href)}
               >
@@ -136,23 +149,21 @@ const DynamicSidebar = ({
           </VStack>
         ))}
 
-        {/* Instructors Section (for course pages) */}
-        {navigationConfig.type === 'course' && (instructors || navigationConfig.instructors) && (
+        {/* Instructor Section (for course pages) */}
+        {navigationConfig.type === 'course' && instructor && (
           <VStack align="stretch" gap={2}>
-            <Heading size="sm" color={textColor}>استادان</Heading>
-            {(instructors || navigationConfig.instructors)?.map((instructor, index) => (
-              <HStack key={index} gap={2}>
-                <Icon as={FiUser} color={textColor} />
-                <Text fontSize="sm" color={textColor}>{instructor}</Text>
-              </HStack>
-            ))}
+            <Heading size="md" color={textColor}>استاد درس</Heading>
+            <HStack gap={2}>
+              <Icon as={FiUser} color={textColor} />
+              <Text fontSize="sm" color={textColor}>{instructor}</Text>
+            </HStack>
           </VStack>
         )}
 
         {/* Course Actions (for course pages) */}
         {navigationConfig.type === 'course' && navigationConfig.courseActions && (
           <VStack align="stretch" gap={2}>
-            <Heading size="sm" color={textColor}>عملیات درس</Heading>
+            <Heading size="md" color={textColor}>عملیات درس</Heading>
             {navigationConfig.courseActions.map((action, index) => (
               <Button
                 key={index}

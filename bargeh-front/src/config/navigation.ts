@@ -1,7 +1,6 @@
 import { 
   FiHome, 
   FiBook, 
-  FiCalendar, 
   FiSettings, 
   FiLogOut,
   FiGrid, 
@@ -27,7 +26,6 @@ export interface SidebarConfig {
   title?: string;
   subtitle?: string;
   sections: NavigationSection[];
-  instructors?: string[];
   courseActions?: NavigationItem[];
 }
 
@@ -37,9 +35,8 @@ export const homeNavigationConfig: SidebarConfig = {
   sections: [
     {
       items: [
-        { icon: FiHome, label: "میز کار", href: '/' },
-        { icon: FiBook, label: "داشبورد دوره‌ها", href: '/courses' },
-        { icon: FiCalendar, label: "پاییز ۱۴۰۳", href: '/fall-2024' },
+        { icon: FiHome, label: "صفحه اصلی", href: '/' },
+        { icon: FiBook, label: "داشبورد درس‌ها", href: '/courses' },
         { icon: FiSettings, label: "تنظیمات", href: '/settings' },
       ]
     }
@@ -49,23 +46,16 @@ export const homeNavigationConfig: SidebarConfig = {
 // Course page navigation configuration
 export const courseNavigationConfig: SidebarConfig = {
   type: 'course',
-  title: "آزمایشگاه ریز پردازنده_01_4032",
-  subtitle: "آزمایشگاه ریز پردازنده - ترم بهار 1403/1404",
   sections: [
     {
       items: [
         { icon: FiGrid, label: "داشبورد", href: '/courses', path: '/courses' },
-        { icon: FiFileText, label: "تمرین‌ها", href: '/courses/assignments', path: '/courses/assignments' },
+        { icon: FiFileText, label: "تکالیف", href: '/courses/assignments', path: '/courses/assignments' },
         { icon: FiUsers, label: "لیست دانشجویان", href: '/courses/roster', path: '/courses/roster' },
         { icon: FiClock, label: "تمدیدها", href: '/courses/extensions', path: '/courses/extensions' },
         { icon: FiSettings, label: "تنظیمات درس", href: '/courses/settings', path: '/courses/settings' },
       ]
     }
-  ],
-  instructors: [
-    "دکتر احمدی",
-    "دکتر محمدی", 
-    "دکتر رضایی"
   ],
   courseActions: [
     { icon: FiLogOut, label: "انصراف از درس", href: '/courses/unenroll' }
@@ -73,8 +63,28 @@ export const courseNavigationConfig: SidebarConfig = {
 };
 
 // Function to get navigation config based on current path
-export const getNavigationConfig = (pathname: string): SidebarConfig => {
+export const getNavigationConfig = (pathname: string, courseId?: string): SidebarConfig => {
   if (pathname.startsWith('/courses')) {
+    // If we have a courseId, create dynamic course navigation
+    if (courseId) {
+      return {
+        type: 'course',
+        sections: [
+          {
+            items: [
+              { icon: FiGrid, label: "داشبورد", href: `/courses/${courseId}`, path: `/courses/${courseId}` },
+              { icon: FiFileText, label: "تکالیف", href: `/courses/${courseId}/assignments`, path: `/courses/${courseId}/assignments` },
+              { icon: FiUsers, label: "لیست دانشجویان", href: `/courses/${courseId}/roster`, path: `/courses/${courseId}/roster` },
+              { icon: FiClock, label: "تمدیدها", href: `/courses/${courseId}/extensions`, path: `/courses/${courseId}/extensions` },
+              { icon: FiSettings, label: "تنظیمات درس", href: `/courses/${courseId}/settings`, path: `/courses/${courseId}/settings` },
+            ]
+          }
+        ],
+        courseActions: [
+          { icon: FiLogOut, label: "انصراف از درس", href: `/courses/${courseId}/unenroll` }
+        ]
+      };
+    }
     return courseNavigationConfig;
   }
   return homeNavigationConfig;

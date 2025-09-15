@@ -43,27 +43,29 @@ export const useCourses = (): UseCoursesReturn => {
     try {
       setError(null);
       const newCourse = await courseService.createCourse(courseData);
-      setCourses(prev => [...prev, newCourse]);
+      // Refresh courses from backend to get proper display values
+      await loadCourses();
       return newCourse;
     } catch (err: unknown) {
       const errorMessage = (err as { response?: { data?: { detail?: string } } }).response?.data?.detail || 'Failed to create course';
       setError(errorMessage);
       throw err;
     }
-  }, []);
+  }, [loadCourses]);
 
   const enrollCourse = useCallback(async (enrollData: EnrollCourseRequest): Promise<Course> => {
     try {
       setError(null);
       const enrolledCourse = await courseService.enrollCourse(enrollData);
-      setCourses(prev => [...prev, enrolledCourse]);
+      // Refresh courses from backend to get proper display values
+      await loadCourses();
       return enrolledCourse;
     } catch (err: unknown) {
       const errorMessage = (err as { response?: { data?: { detail?: string } } }).response?.data?.detail || 'Failed to enroll in course';
       setError(errorMessage);
       throw err;
     }
-  }, []);
+  }, [loadCourses]);
 
   const updateCourse = useCallback(async (courseId: number, updates: Partial<Course>): Promise<Course> => {
     try {

@@ -40,7 +40,7 @@ const CreateCourseCard = ({ onClick }: CreateCourseCardProps) => {
       <VStack align="center">
         <Icon as={FiPlus} boxSize={6} color={textColor} mb={2} />
         <Text color={textColor} fontSize={{ base: "sm", md: "md" }} fontWeight="medium" textAlign="center">
-          ایجاد دوره جدید
+          ایجاد درس جدید
         </Text>
       </VStack>
     </Box>

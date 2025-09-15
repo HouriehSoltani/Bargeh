@@ -16,13 +16,7 @@ export interface Course {
   courseCode: string;
   description: string;
   instructor: string;
-  duration: string;
   students: number;
-  rating: number;
-  progress: number;
-  category: string;
-  level: string;
-  image: string;
   enrolled: boolean;
   assignments: number;
   term: string;
@@ -40,7 +34,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
   const navigate = useNavigate();
 
   const handleCourseClick = () => {
-    navigate(`/courses/${course.id}/assignments`);
+    navigate(`/courses/${course.id}`);
   };
 
 

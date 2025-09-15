@@ -77,7 +77,7 @@ const LoginPage = () => {
               ورود به سیستم
             </Heading>
             <Text color="gray.600" textAlign="center" fontSize="sm">
-              برای دسترسی به داشبورد دوره‌ها، لطفاً وارد شوید
+              برای دسترسی به داشبورد درس‌ها، لطفاً وارد شوید
             </Text>
           </VStack>
 

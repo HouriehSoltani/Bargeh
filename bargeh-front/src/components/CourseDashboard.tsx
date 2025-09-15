@@ -59,7 +59,7 @@ const CourseDashboard = () => {
       <Box bg={bgColor} minH="100vh" p={6} display="flex" alignItems="center" justifyContent="center">
         <VStack>
           <Spinner size="xl" color="blue.500" />
-          <Heading size="md" color={textColor}>در حال بارگذاری دوره‌ها...</Heading>
+          <Heading size="md" color={textColor}>در حال بارگذاری درس‌ها...</Heading>
         </VStack>
       </Box>
     );
@@ -99,7 +99,7 @@ const CourseDashboard = () => {
             fontFamily="inherit"
             fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}
           >
-            داشبورد دوره‌ها
+            داشبورد درس‌ها
           </Heading>
       </VStack>
 
@@ -132,7 +132,7 @@ const CourseDashboard = () => {
             onClick={enrollDialog.onOpen}
           >
             <Icon as={FiFileText} mr={2} />
-            ثبت‌نام در دوره
+            ثبت‌نام در درس
           </Button>
           <Button
             bg="#2E5BBA"
@@ -144,7 +144,7 @@ const CourseDashboard = () => {
             onClick={createDialog.onOpen}
           >
             <Icon as={FiPlus} mr={2} />
-            ایجاد دوره
+            ایجاد درس
           </Button>
         </HStack>
       </Box>
