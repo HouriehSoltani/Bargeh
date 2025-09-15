@@ -134,7 +134,7 @@ const CoursePage = () => {
                         </HStack>
                       </Box>
                       <Box as="th" p={3} textAlign="center" color={textColor} fontWeight="semibold">انتشار</Box>
-                      <Box as="th" p={3} textAlign="center" color={textColor} fontWeight="semibold">بازنمره‌دهی</Box>
+                      <Box as="th" p={3} textAlign="center" color={textColor} fontWeight="semibold">بازبینی</Box>
                       <Box as="th" p={3} textAlign="center" width="50px"></Box>
                     </Box>
                   </Box>
