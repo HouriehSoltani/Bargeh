@@ -1,11 +1,40 @@
 import DynamicSidebar from "@/components/DynamicSidebar";
-import { Box, Grid, GridItem, Heading, VStack, Button, Input, Textarea, HStack, Icon } from "@chakra-ui/react";
+import { Box, Grid, GridItem, Heading, VStack, Button, Input, Textarea, HStack, Icon, Spinner, Text } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
 import { FiSave } from "react-icons/fi";
+import { useParams } from "react-router-dom";
+import { useCourse } from "@/hooks/useCourse";
 
 const SettingsPage = () => {
+  const { courseId } = useParams<{ courseId: string }>();
+  const { course, isLoading, error } = useCourse(courseId);
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
+  const subtleText = useColorModeValue("gray.600", "gray.300");
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <Box bg={bgColor} minH="100vh" p={6} display="flex" alignItems="center" justifyContent="center">
+        <VStack>
+          <Spinner size="xl" color="blue.500" />
+          <Text color={textColor}>در حال بارگذاری درس...</Text>
+        </VStack>
+      </Box>
+    );
+  }
+
+  // Show error state
+  if (error || !course) {
+    return (
+      <Box bg={bgColor} minH="100vh" p={6} display="flex" alignItems="center" justifyContent="center">
+        <VStack>
+          <Text color="red.500" fontSize="lg">خطا در بارگذاری درس</Text>
+          <Text color={subtleText}>{error || 'درس یافت نشد'}</Text>
+        </VStack>
+      </Box>
+    );
+  }
 
   return (
     <Grid
@@ -15,7 +44,12 @@ const SettingsPage = () => {
       gap={0}
     >
       <GridItem area="aside" display={{ base: "none", md: "block" }}>
-        <DynamicSidebar />
+        <DynamicSidebar 
+          courseTitle={course.title}
+          courseSubtitle={`${course.term} ${course.year}`}
+          instructor={course.instructor}
+          courseId={courseId}
+        />
       </GridItem>
 
       <GridItem area="main">

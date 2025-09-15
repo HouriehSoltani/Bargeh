@@ -102,7 +102,7 @@ const AssignmentsPage = () => {
                         نام تکلیف
                       </Box>
                       <Box as="th" p={3} textAlign="right" color={textColor} fontWeight="semibold">
-                        نمره
+                        بارم‌بندی
                       </Box>
                       <Box as="th" p={3} textAlign="right" color={textColor} fontWeight="semibold">
                         <HStack gap={1}>
@@ -129,7 +129,7 @@ const AssignmentsPage = () => {
                         </HStack>
                       </Box>
                       <Box as="th" p={3} textAlign="center" color={textColor} fontWeight="semibold">انتشار</Box>
-                      <Box as="th" p={3} textAlign="center" color={textColor} fontWeight="semibold">بازنمره‌دهی</Box>
+                      <Box as="th" p={3} textAlign="center" color={textColor} fontWeight="semibold">بازبینی</Box>
                       <Box as="th" p={3} textAlign="center" width="50px"></Box>
                     </Box>
                   </Box>
