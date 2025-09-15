@@ -11,6 +11,7 @@ const ExtensionsPage = () => {
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
   const subtleText = useColorModeValue("gray.600", "gray.300");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
 
   // Show loading state
   if (isLoading) {
@@ -75,7 +76,7 @@ const ExtensionsPage = () => {
             
             <Box
               borderWidth="1px"
-              borderColor={useColorModeValue("gray.200", "gray.700")}
+              borderColor={borderColor}
               borderRadius="md"
               py={16}
               textAlign="center"

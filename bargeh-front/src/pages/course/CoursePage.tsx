@@ -24,6 +24,10 @@ const CoursePage = () => {
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
   const subtleText = useColorModeValue("gray.600", "gray.300");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
+  const tableHeaderBg = useColorModeValue("gray.50", "gray.800");
+  const tableRowHover = useColorModeValue("gray.50", "gray.800");
+  const progressBg = useColorModeValue("gray.200", "gray.600");
 
   // Show loading state
   if (isLoading) {
@@ -99,13 +103,13 @@ const CoursePage = () => {
             <VStack align="stretch" gap={4}>
               <Box
                 borderWidth="1px"
-                borderColor={useColorModeValue("gray.200", "gray.700")}
+                borderColor={borderColor}
                 borderRadius="md"
                 overflow="hidden"
               >
                 <Box as="table" width="100%" fontSize="sm">
-                  <Box as="thead" bg={useColorModeValue("gray.50", "gray.800")}>
-                    <Box as="tr" borderBottom="1px" borderColor={useColorModeValue("gray.200", "gray.700")}>
+                  <Box as="thead" bg={tableHeaderBg}>
+                    <Box as="tr" borderBottom="1px" borderColor={borderColor}>
                       <Box as="th" p={3} textAlign="right" color={textColor} fontWeight="semibold">
                          تکالیف فعال
                       </Box>
@@ -143,8 +147,8 @@ const CoursePage = () => {
                     <Box 
                       as="tr" 
                       borderBottom="1px" 
-                      borderColor={useColorModeValue("gray.100", "gray.700")}
-                      _hover={{ bg: useColorModeValue("gray.50", "gray.800") }}
+                      borderColor={borderColor}
+                      _hover={{ bg: tableRowHover }}
                     >
                       <Box as="td" p={3} color={textColor} fontWeight="medium">
                         تکلیف نمونه
@@ -163,7 +167,7 @@ const CoursePage = () => {
                           <Box
                             width="100px"
                             height="6px"
-                            bg={useColorModeValue("gray.200", "gray.600")}
+                            bg={progressBg}
                             borderRadius="md"
                             position="relative"
                             overflow="hidden"

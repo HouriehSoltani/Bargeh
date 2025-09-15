@@ -1,5 +1,6 @@
 import CourseDashboard from "@/components/CourseDashboard";
 import DynamicSidebar from "@/components/DynamicSidebar";
+import { homeNavigationConfig } from "@/config/navigation";
 import { Grid, GridItem } from "@chakra-ui/react";
 
 const HomePage = () => {
@@ -15,7 +16,7 @@ const HomePage = () => {
     >
       {/* Sidebar */}
       <GridItem area="aside" display={{ base: "none", md: "block" }}>
-        <DynamicSidebar />
+        <DynamicSidebar config={homeNavigationConfig} />
       </GridItem>
 
       {/* Main Content Area */}

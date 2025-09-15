@@ -3,7 +3,7 @@ export const API_CONFIG = {
   // Base URL for your Django backend
   // In development, use relative path to leverage Vite proxy
   // In production, use full URL
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? '' : 'http://localhost:8000'),
+  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
   
   // API endpoints
   ENDPOINTS: {

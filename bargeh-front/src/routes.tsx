@@ -30,6 +30,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <HomePage /> },
+      { path: "courses", element: <HomePage /> },
       { path: "courses/:courseId", element: <CoursePage /> },
       { path: "courses/:courseId/assignments", element: <AssignmentsPage /> },
       { path: "courses/:courseId/roster", element: <RosterPage /> },

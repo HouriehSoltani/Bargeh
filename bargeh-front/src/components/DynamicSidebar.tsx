@@ -84,7 +84,21 @@ const DynamicSidebar = ({
       <VStack gap={6} align="stretch">
         {/* User Info (if authenticated and on home page) */}
         {isAuthenticated && user && (
-          <Box p={3} bg="white" borderRadius="md" border="1px solid" borderColor={borderColor}>
+          <Box 
+            p={3} 
+            bg="white" 
+            borderRadius="md" 
+            border="1px solid" 
+            borderColor={borderColor}
+            cursor="pointer"
+            _hover={{ 
+              bg: "gray.50",
+              transform: "translateX(-2px)",
+              boxShadow: "sm"
+            }}
+            transition="all 0.2s"
+            onClick={() => navigate('/')}
+          >
             <HStack gap={3}>
               <Box 
                 w="32px" 
