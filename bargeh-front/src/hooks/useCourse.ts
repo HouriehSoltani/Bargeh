@@ -20,11 +20,17 @@ export const useCourse = (courseId: string | undefined): UseCourseReturn => {
       return;
     }
 
+    const numericCourseId = parseInt(courseId);
+    if (isNaN(numericCourseId)) {
+      setError('Invalid course ID');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
-      const courseData = await courseService.getCourse(parseInt(courseId));
+      const courseData = await courseService.getCourse(numericCourseId);
       setCourse(courseData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch course');

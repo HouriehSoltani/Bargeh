@@ -112,7 +112,7 @@ const AssignmentsPage = () => {
                         نام تکلیف
                       </Box>
                       <Box as="th" p={3} textAlign="right" color={textColor} fontWeight="semibold">
-                        بارم‌بندی
+                       نمره کل
                       </Box>
                       <Box as="th" p={3} textAlign="right" color={textColor} fontWeight="semibold">
                         <HStack gap={1}>

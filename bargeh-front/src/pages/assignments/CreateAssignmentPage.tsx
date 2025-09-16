@@ -33,15 +33,7 @@ interface FormData {
   templatePdf: File | null;
   anonymizedGrading: boolean;
   uploadByStudent: 'student' | 'instructor';
-  releaseAt: string;
   dueAt: string;
-  allowLate: boolean;
-  lateDueAt: string;
-  variableLength: boolean;
-  enforceTimeLimit: boolean;
-  timeLimitMinutes: number;
-  groupEnabled: boolean;
-  groupMaxSize: number;
   totalPoints: number;
 }
 
@@ -91,15 +83,7 @@ const CreateAssignmentMerged = () => {
     templatePdf: null,
     anonymizedGrading: false,
     uploadByStudent: 'student',
-    releaseAt: '',
     dueAt: '',
-    allowLate: false,
-    lateDueAt: '',
-    variableLength: true,
-    enforceTimeLimit: false,
-    timeLimitMinutes: 60,
-    groupEnabled: false,
-    groupMaxSize: 2,
     totalPoints: 100
   });
 
@@ -115,6 +99,10 @@ const CreateAssignmentMerged = () => {
   const cardHover = useColorModeValue("gray.50", "gray.700");
   const selectedBg = useColorModeValue("blue.50", "blue.900");
   const selectedBorder = useColorModeValue("blue.200", "blue.700");
+  const formBg = useColorModeValue("gray.100", "gray.800");
+  const formBorder = useColorModeValue("gray.200", "gray.600");
+  const inputBg = useColorModeValue("gray.50", "gray.700");
+  const inputBorder = useColorModeValue("gray.300", "gray.600");
 
   const handleInputChange = (field: keyof FormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -140,20 +128,8 @@ const CreateAssignmentMerged = () => {
       errors.templatePdf = 'فایل تکلیف الزامی است';
     }
 
-    if (!formData.releaseAt) {
-      errors.releaseAt = 'تاریخ انتشار الزامی است';
-    }
-
     if (!formData.dueAt) {
       errors.dueAt = 'تاریخ تحویل الزامی است';
-    }
-
-    if (formData.allowLate && !formData.lateDueAt) {
-      errors.lateDueAt = 'تاریخ تحویل دیرهنگام الزامی است';
-    }
-
-    if (formData.groupEnabled && formData.groupMaxSize < 2) {
-      errors.groupMaxSize = 'اندازه گروه باید حداقل 2 باشد';
     }
 
     setValidationErrors(errors);
@@ -173,24 +149,12 @@ const CreateAssignmentMerged = () => {
       formDataToSend.append('template_pdf', formData.templatePdf!);
       formDataToSend.append('anonymized_grading', String(formData.anonymizedGrading));
       formDataToSend.append('upload_by_student', String(formData.uploadByStudent === 'student'));
-      formDataToSend.append('release_at', new Date(formData.releaseAt).toISOString());
       formDataToSend.append('due_at', new Date(formData.dueAt).toISOString());
-      formDataToSend.append('allow_late', String(formData.allowLate));
-      if (formData.allowLate && formData.lateDueAt) {
-        formDataToSend.append('late_due_at', new Date(formData.lateDueAt).toISOString());
-      }
-      formDataToSend.append('variable_length', String(formData.variableLength));
-      if (formData.enforceTimeLimit) {
-        formDataToSend.append('time_limit_minutes', String(formData.timeLimitMinutes));
-      }
-      formDataToSend.append('group_enabled', String(formData.groupEnabled));
-      if (formData.groupEnabled) {
-        formDataToSend.append('group_max_size', String(formData.groupMaxSize));
-      }
       formDataToSend.append('total_points', String(formData.totalPoints));
       formDataToSend.append('is_published', 'false');
+      formDataToSend.append('type', 'homework');
 
-      await api.post('/assignments/homework/', formDataToSend, {
+      await api.post('/assignments/', formDataToSend, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
@@ -379,10 +343,10 @@ const CreateAssignmentMerged = () => {
               {selectedType === 'homework' && (
                 <Box
                   width="70%"
-                  bg={useColorModeValue("gray.100", "gray.800")}
+                  bg={formBg}
                   borderRadius="lg"
                   border="1px"
-                  borderColor={useColorModeValue("gray.200", "gray.600")}
+                  borderColor={formBorder}
                   p={6}
 
                   overflowY="auto"
@@ -400,9 +364,9 @@ const CreateAssignmentMerged = () => {
                       color={textColor}
                       size="sm"
                       fontSize="sm"
-                      bg={useColorModeValue("gray.50", "gray.700")}
+                      bg={inputBg}
                       border="1px solid"
-                      borderColor={useColorModeValue("gray.300", "gray.600")}
+                      borderColor={inputBorder}
                       borderRadius="md"
                       _placeholder={{ pr: 2, fontSize: "sm" }}
                       _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px #3182ce' }}
@@ -429,9 +393,9 @@ const CreateAssignmentMerged = () => {
                       justifyContent="flex-start"
                       size="sm"
                       fontSize="sm"
-                      bg={useColorModeValue("gray.50", "gray.700")}
+                      bg={inputBg}
                       border="1px solid"
-                      borderColor={useColorModeValue("gray.300", "gray.600")}
+                      borderColor={inputBorder}
                       borderRadius="md"
                       children={
                         <HStack paddingRight={2}>
@@ -501,7 +465,7 @@ const CreateAssignmentMerged = () => {
 
                   {/* Points */}
                   <VStack align="stretch" gap={2}>
-                    <Text fontWeight="medium" color={textColor}>بارم کل تکلیف</Text>
+                    <Text fontWeight="medium" color={textColor}>نمره کل تکلیف</Text>
                     <Input
                       type="number"
                       value={formData.totalPoints}
@@ -511,9 +475,9 @@ const CreateAssignmentMerged = () => {
                       size="sm"
                       fontSize="sm"
                       pr={4}
-                      bg={useColorModeValue("gray.50", "gray.700")}
+                      bg={inputBg}
                       border="1px solid"
-                      borderColor={useColorModeValue("gray.300", "gray.600")}
+                      borderColor={inputBorder}
                       borderRadius="md"
                       _placeholder={{ pr: 4, fontSize: "sm" }}
                     />

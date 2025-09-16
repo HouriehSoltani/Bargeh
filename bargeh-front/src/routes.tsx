@@ -9,7 +9,7 @@ import AssignmentsPage from "./pages/course/AssignmentsPage";
 import RosterPage from "./pages/course/RosterPage";
 import ExtensionsPage from "./pages/course/ExtensionsPage";
 import SettingsPage from "./pages/course/SettingsPage";
-import CreateAssignmentMerged from "./pages/assignments/CreateAssignmentMerged";
+import CreateAssignmentMerged from "./pages/assignments/CreateAssignmentPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const router = createBrowserRouter([

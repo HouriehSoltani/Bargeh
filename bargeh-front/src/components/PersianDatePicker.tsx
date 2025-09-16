@@ -6,11 +6,11 @@ import { useColorModeValue } from '@/hooks/useColorMode';
 // Import the required styles
 import "@react-shamsi/calendar/dist/styles.css";
 import "@react-shamsi/datepicker/dist/styles.css";
+import "@react-shamsi/timepicker/dist/styles.css";
 
 interface PersianDatePickerProps {
   value: string;
   onChange: (value: string) => void;
-  placeholder?: string;
   errorMessage?: string;
   label?: string;
 }
@@ -18,7 +18,6 @@ interface PersianDatePickerProps {
 const PersianDatePicker: React.FC<PersianDatePickerProps> = ({
   value,
   onChange,
-  placeholder = "تاریخ را انتخاب کنید",
   errorMessage,
   label
 }) => {
@@ -42,6 +41,7 @@ const PersianDatePicker: React.FC<PersianDatePickerProps> = ({
     onChange(isoString);
   };
 
+
   return (
     <Box>
       {label && (
@@ -53,8 +53,8 @@ const PersianDatePicker: React.FC<PersianDatePickerProps> = ({
         <DatePicker
           date={getJalaliDate(value)}
           onChange={handleDateChange}
-          placeholder={placeholder}
-          dateFormat="yyyy/MM/dd"
+          placeholder="تاریخ و زمان را انتخاب کنید"
+          dateFormat="yyyy/MM/dd HH:mm"
           persianDigits={true}
           autoUpdate={true}
           calendarProps={{

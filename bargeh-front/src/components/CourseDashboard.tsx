@@ -6,7 +6,7 @@ import EnrollCoursePopup from "./EnrollCoursePopup";
 import CreateCoursePopup from "./CreateCoursePopup";
 import { useCourses } from "@/hooks/useCourses";
 import { useAuth } from "@/hooks/useAuth";
-// import { useNavigate } from "react-router-dom"; // Commented out since authentication is bypassed
+import { useNavigate } from "react-router-dom";
 
 const CourseDashboard = () => {
   const bgColor = useColorModeValue("white", "gray.900");
@@ -17,12 +17,14 @@ const CourseDashboard = () => {
   // API hooks
   const { courses, isLoading, error, createCourse, enrollCourse, clearError } = useCourses();
   const { isAuthenticated } = useAuth();
-  // const navigate = useNavigate(); // Commented out since authentication is bypassed
+  const navigate = useNavigate();
 
   const handleEnrollSubmit = async (values: { entryCode: string }) => {
     try {
-      await enrollCourse(values);
+      const enrolledCourse = await enrollCourse(values);
       enrollDialog.onClose();
+      // Navigate to the enrolled course page
+      navigate(`/courses/${enrolledCourse.id}`);
     } catch (error) {
       console.error('Failed to enroll in course:', error);
     }
@@ -36,8 +38,10 @@ const CourseDashboard = () => {
     year?: number;
   }) => {
     try {
-      await createCourse(values);
+      const newCourse = await createCourse(values);
       createDialog.onClose();
+      // Navigate to the newly created course page
+      navigate(`/courses/${newCourse.id}`);
     } catch (error) {
       console.error('Failed to create course:', error);
     }
