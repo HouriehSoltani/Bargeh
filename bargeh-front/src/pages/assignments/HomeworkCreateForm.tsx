@@ -12,9 +12,10 @@ import {
   Stack
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
-import { FiUpload, FiCheck, FiArrowRight } from "react-icons/fi";
+import { FiUpload, FiArrowRight, FiCalendar, FiClock, FiUsers, FiFileText } from "react-icons/fi";
 import { useParams, useNavigate } from "react-router-dom";
 import DynamicSidebar from "@/components/DynamicSidebar";
+import PersianDatePicker from "@/components/PersianDatePicker";
 import { useCourse } from "@/hooks/useCourse";
 import { useState, useRef } from "react";
 import { api } from "@/services/api";
@@ -65,6 +66,8 @@ const HomeworkCreateForm = () => {
 
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
+  const sectionBg = useColorModeValue("gray.50", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
 
   const handleInputChange = (field: keyof FormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -87,7 +90,7 @@ const HomeworkCreateForm = () => {
     }
 
     if (!formData.templatePdf) {
-      errors.templatePdf = 'فایل PDF قالب الزامی است';
+      errors.templatePdf = 'فایل تکلیف الزامی است';
     }
 
     if (!formData.releaseAt) {
@@ -103,7 +106,7 @@ const HomeworkCreateForm = () => {
     }
 
     if (formData.groupEnabled && formData.groupMaxSize < 2) {
-      errors.groupMaxSize = 'حداکثر اندازه گروه باید حداقل 2 باشد';
+      errors.groupMaxSize = 'اندازه گروه باید حداقل 2 باشد';
     }
 
     setValidationErrors(errors);
@@ -224,80 +227,67 @@ const HomeworkCreateForm = () => {
       </GridItem>
 
       <GridItem area="main">
-        <Box bg={bgColor} minH="100vh" p={{ base: 4, md: 6 }} pb={24} position="relative">
-          <VStack align="stretch" gap={6} maxW="800px">
-            {/* Header with Progress Indicator */}
+        <Box bg={bgColor} minH="100vh" p={{ base: 6, md: 8 }} pb={24} position="relative">
+          <VStack align="stretch" gap={8} maxW="800px" mx="auto">
+            {/* Header */}
             <VStack align="stretch" gap={4}>
-              <Heading size="xl" color={textColor}>ایجاد تکلیف</Heading>
+              <Heading size="xl" color={textColor} textAlign="center" fontWeight="bold">
+                ایجاد تکلیف جدید
+              </Heading>
               
-              {/* Progress Indicator */}
-              <HStack gap={0} align="center" justify="flex-start">
-                {/* Step 1 - Completed */}
-                <HStack gap={3} align="center">
+              {/* Simple Progress Indicator */}
+              <HStack justify="center" gap={4}>
+                <HStack gap={2} align="center">
                   <Box
-                    w="28px"
-                    h="28px"
+                    w="8px"
+                    h="8px"
                     borderRadius="full"
                     bg="blue.500"
-                    color="white"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    fontSize="sm"
-                    fontWeight="bold"
-                  >
-                    <Icon as={FiCheck} boxSize={4} />
-                  </Box>
-                  <Text color="gray.500" fontWeight="medium" fontSize="sm">نوع تکلیف</Text>
+                  />
+                  <Text color="gray.500" fontSize="sm">نوع تکلیف</Text>
                 </HStack>
-                
-                {/* Progress Line */}
-                <Box
-                  w="60px"
-                  h="2px"
-                  bg="blue.500"
-                  mx={2}
-                />
-                
-                {/* Step 2 - Active */}
-                <HStack gap={3} align="center">
+                <Box w="40px" h="1px" bg="blue.500" />
+                <HStack gap={2} align="center">
                   <Box
-                    w="28px"
-                    h="28px"
+                    w="8px"
+                    h="8px"
                     borderRadius="full"
                     bg="blue.500"
-                    color="white"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    fontSize="sm"
-                    fontWeight="bold"
-                  >
-                    2
-                  </Box>
-                  <Text color={textColor} fontWeight="medium" fontSize="sm">تنظیمات تکلیف</Text>
+                  />
+                  <Text color={textColor} fontSize="sm" fontWeight="medium">تنظیمات تکلیف</Text>
                 </HStack>
               </HStack>
             </VStack>
             
+            {/* Form Content */}
+            <VStack align="stretch" gap={8}>
+              {/* Basic Information */}
+              <Box bg={sectionBg} p={6} borderRadius="lg" border="1px" borderColor={borderColor}>
             <VStack align="stretch" gap={6}>
+                  <HStack gap={3} mb={2}>
+                    <Icon as={FiFileText} color="blue.500" boxSize={5} />
+                    <Heading size="md" color={textColor}>اطلاعات پایه</Heading>
+                  </HStack>
+                  
               {/* Assignment Name */}
               <VStack align="stretch" gap={2}>
-                <Box as="label" fontWeight="medium" color={textColor}>نام تکلیف *</Box>
+                    <Text fontWeight="medium" color={textColor}>نام تکلیف *</Text>
                 <Input
                   value={formData.title}
                   onChange={(e) => handleInputChange('title', e.target.value)}
                   placeholder="نام تکلیف را وارد کنید"
                   color={textColor}
+                      size="lg"
+                      _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px #3182ce' }}
                 />
                 {validationErrors.title && (
-                  <Box color="red.500" fontSize="sm">{validationErrors.title}</Box>
+                      <Text color="red.500" fontSize="sm">{validationErrors.title}</Text>
                 )}
               </VStack>
 
               {/* Template PDF */}
               <VStack align="stretch" gap={2}>
-                <Box as="label" fontWeight="medium" color={textColor}>فایل تکلیف (PDF) *</Box>
+                    <Text fontWeight="medium" color={textColor}>فایل تکلیف (PDF) *</Text>
                 <Input
                   ref={fileInputRef}
                   type="file"
@@ -310,40 +300,58 @@ const HomeworkCreateForm = () => {
                   variant="outline"
                   w="full"
                   justifyContent="flex-start"
-                >
-                  <Icon as={FiUpload} mr={2} />
-                  {formData.templatePdf ? formData.templatePdf.name : 'انتخاب فایل PDF'}
-                </Button>
+                      size="lg"
+                      children={
+                        <HStack>
+                          <Icon as={FiUpload} />
+                          <Text>{formData.templatePdf ? formData.templatePdf.name : 'انتخاب فایل PDF'}</Text>
+                        </HStack>
+                      }
+                      _hover={{ bg: 'blue.50', borderColor: 'blue.300' }}
+                    />
                 {validationErrors.templatePdf && (
-                  <Box color="red.500" fontSize="sm">{validationErrors.templatePdf}</Box>
+                      <Text color="red.500" fontSize="sm">{validationErrors.templatePdf}</Text>
                 )}
               </VStack>
+                </VStack>
+              </Box>
+
+              {/* Submission Settings */}
+              <Box bg={sectionBg} p={6} borderRadius="lg" border="1px" borderColor={borderColor}>
+                <VStack align="stretch" gap={6}>
+                  <HStack gap={3} mb={2}>
+                    <Icon as={FiUsers} color="green.500" boxSize={5} />
+                    <Heading size="md" color={textColor}>تنظیمات ارسال</Heading>
+                  </HStack>
 
               {/* Submission Anonymization */}
-              <VStack align="stretch" gap={2}>
-                <HStack>
+                  <HStack justify="space-between" align="center">
+                    <VStack align="stretch" gap={1}>
+                      <Text fontWeight="medium" color={textColor}>ناشناس کردن تکالیف</Text>
+                      <Text fontSize="sm" color="gray.500">تکالیف تحویل داده شده به صورت ناشناس نمایش داده می‌شوند</Text>
+                    </VStack>
                   <input
                     type="checkbox"
                     checked={formData.anonymizedGrading}
-                    onChange={(e) => handleInputChange('anonymizedGrading', e.target.checked)}
+                      onChange={(e: any) => handleInputChange('anonymizedGrading', e.target.checked)}
+                      style={{ transform: 'scale(1.2)' }}
                   />
-                  <Box as="label" fontWeight="medium" color={textColor}>ناشناس کردن تکالیف تحویل داده شده</Box>
                 </HStack>
-              </VStack>
 
               {/* Who will Upload Submissions */}
-              <VStack align="stretch" gap={2}>
-                <Box as="label" fontWeight="medium" color={textColor}>آپلود تکالیف تحویل داده شده توسط</Box>
-                <Stack direction="row" gap={6}>
+                  <VStack align="stretch" gap={3}>
+                    <Text fontWeight="medium" color={textColor}>آپلود تکالیف توسط</Text>
+                    <Stack direction="row" gap={8}>
                   <HStack>
                     <input
                       type="radio"
                       name="uploadByStudent"
                       value="student"
                       checked={formData.uploadByStudent === 'student'}
-                      onChange={(e) => handleInputChange('uploadByStudent', e.target.value)}
+                          onChange={(e: any) => handleInputChange('uploadByStudent', e.target.value)}
+                          style={{ transform: 'scale(1.2)' }}
                     />
-                    <Box as="label" color={textColor}>دانشجو</Box>
+                        <Text color={textColor}>دانشجو</Text>
                   </HStack>
                   <HStack>
                     <input
@@ -351,108 +359,27 @@ const HomeworkCreateForm = () => {
                       name="uploadByStudent"
                       value="instructor"
                       checked={formData.uploadByStudent === 'instructor'}
-                      onChange={(e) => handleInputChange('uploadByStudent', e.target.value)}
+                          onChange={(e: any) => handleInputChange('uploadByStudent', e.target.value)}
+                          style={{ transform: 'scale(1.2)' }}
                     />
-                    <Box as="label" color={textColor}>استاد</Box>
+                        <Text color={textColor}>استاد</Text>
                   </HStack>
                 </Stack>
               </VStack>
 
-              {/* Release Date */}
-              <VStack align="stretch" gap={2}>
-                <Box as="label" fontWeight="medium" color={textColor}>تاریخ انتشار *</Box>
-                <Input
-                  type="datetime-local"
-                  value={formData.releaseAt}
-                  onChange={(e) => handleInputChange('releaseAt', e.target.value)}
-                  color={textColor}
-                />
-                {validationErrors.releaseAt && (
-                  <Box color="red.500" fontSize="sm">{validationErrors.releaseAt}</Box>
-                )}
-              </VStack>
-
-              {/* Due Date */}
-              <VStack align="stretch" gap={2}>
-                <Box as="label" fontWeight="medium" color={textColor}>تاریخ تحویل *</Box>
-                <Input
-                  type="datetime-local"
-                  value={formData.dueAt}
-                  onChange={(e) => handleInputChange('dueAt', e.target.value)}
-                  color={textColor}
-                />
-                {validationErrors.dueAt && (
-                  <Box color="red.500" fontSize="sm">{validationErrors.dueAt}</Box>
-                )}
-              </VStack>
-
-              {/* Allow Late Submissions */}
-              <VStack align="stretch" gap={2}>
-                <HStack>
-                  <input
-                    type="checkbox"
-                    checked={formData.allowLate}
-                    onChange={(e) => handleInputChange('allowLate', e.target.checked)}
-                  />
-                  <Box as="label" fontWeight="medium" color={textColor}>اجازه تحویل دیرهنگام</Box>
-                </HStack>
-              </VStack>
-
-              {/* Late Due Date */}
-              {formData.allowLate && (
-                <VStack align="stretch" gap={2}>
-                  <Box as="label" fontWeight="medium" color={textColor}>تاریخ تحویل دیرهنگام *</Box>
-                  <Input
-                    type="datetime-local"
-                    value={formData.lateDueAt}
-                    onChange={(e) => handleInputChange('lateDueAt', e.target.value)}
-                    color={textColor}
-                  />
-                  {validationErrors.lateDueAt && (
-                    <Box color="red.500" fontSize="sm">{validationErrors.lateDueAt}</Box>
-                  )}
-                </VStack>
-              )}
-
-              {/* Enforce Time Limit */}
-              <VStack align="stretch" gap={2}>
-                <HStack>
-                  <input
-                    type="checkbox"
-                    checked={formData.enforceTimeLimit}
-                    onChange={(e) => handleInputChange('enforceTimeLimit', e.target.checked)}
-                  />
-                  <Box as="label" fontWeight="medium" color={textColor}>اعمال محدودیت زمانی</Box>
-                </HStack>
-              </VStack>
-
-              {/* Time Limit */}
-              {formData.enforceTimeLimit && (
-                <VStack align="stretch" gap={2}>
-                  <Box as="label" fontWeight="medium" color={textColor}>محدودیت زمانی (دقیقه)</Box>
-                  <Input
-                    type="number"
-                    value={formData.timeLimitMinutes}
-                    onChange={(e) => handleInputChange('timeLimitMinutes', parseInt(e.target.value) || 0)}
-                    min={1}
-                    max={1440}
-                    color={textColor}
-                  />
-                </VStack>
-              )}
-
               {/* Submission Type */}
-              <VStack align="stretch" gap={2}>
-                <Box as="label" fontWeight="medium" color={textColor}>نوع ارسال</Box>
-                <Stack direction="row" gap={6}>
+                  <VStack align="stretch" gap={3}>
+                    <Text fontWeight="medium" color={textColor}>نوع ارسال</Text>
+                    <Stack direction="row" gap={8}>
                   <HStack>
                     <input
                       type="radio"
                       name="variableLength"
                       checked={formData.variableLength}
                       onChange={() => handleInputChange('variableLength', true)}
+                          style={{ transform: 'scale(1.2)' }}
                     />
-                    <Box as="label" color={textColor}>متغیر</Box>
+                        <Text color={textColor}>متغیر</Text>
                   </HStack>
                   <HStack>
                     <input
@@ -460,41 +387,166 @@ const HomeworkCreateForm = () => {
                       name="variableLength"
                       checked={!formData.variableLength}
                       onChange={() => handleInputChange('variableLength', false)}
+                          style={{ transform: 'scale(1.2)' }}
                     />
-                    <Box as="label" color={textColor}>قالب‌دار (طول ثابت)</Box>
+                        <Text color={textColor}>قالب‌دار (طول ثابت)</Text>
                   </HStack>
                 </Stack>
               </VStack>
 
               {/* Group Submission */}
-              <VStack align="stretch" gap={2}>
-                <HStack>
+                  <HStack justify="space-between" align="center">
+                    <VStack align="stretch" gap={1}>
+                      <Text fontWeight="medium" color={textColor}>ارسال گروهی</Text>
+                      <Text fontSize="sm" color="gray.500">دانشجویان می‌توانند به صورت گروهی تکلیف ارسال کنند</Text>
+                    </VStack>
                   <input
                     type="checkbox"
                     checked={formData.groupEnabled}
-                    onChange={(e) => handleInputChange('groupEnabled', e.target.checked)}
+                      onChange={(e: any) => handleInputChange('groupEnabled', e.target.checked)}
+                      style={{ transform: 'scale(1.2)' }}
                   />
-                  <Box as="label" fontWeight="medium" color={textColor}>ارسال گروهی</Box>
                 </HStack>
-              </VStack>
 
               {/* Group Max Size */}
               {formData.groupEnabled && (
                 <VStack align="stretch" gap={2}>
-                  <Box as="label" fontWeight="medium" color={textColor}>حداکثر اندازه گروه</Box>
+                      <Text fontWeight="medium" color={textColor}>حداکثر اندازه گروه</Text>
                   <Input
                     type="number"
                     value={formData.groupMaxSize}
-                    onChange={(e) => handleInputChange('groupMaxSize', parseInt(e.target.value) || 0)}
+                        onChange={(e: any) => handleInputChange('groupMaxSize', parseInt(e.target.value) || 0)}
                     min={2}
                     max={10}
-                    color={textColor}
+                        size="lg"
                   />
                   {validationErrors.groupMaxSize && (
-                    <Box color="red.500" fontSize="sm">{validationErrors.groupMaxSize}</Box>
+                        <Text color="red.500" fontSize="sm">{validationErrors.groupMaxSize}</Text>
+                      )}
+                    </VStack>
                   )}
                 </VStack>
+              </Box>
+
+              {/* Date and Time Settings */}
+              <Box bg={sectionBg} p={6} borderRadius="lg" border="1px" borderColor={borderColor}>
+                <VStack align="stretch" gap={6}>
+                  <HStack gap={3} mb={2}>
+                    <Icon as={FiCalendar} color="purple.500" boxSize={5} />
+                    <Heading size="md" color={textColor}>تاریخ و زمان</Heading>
+                  </HStack>
+                  
+                  <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={6}>
+                    {/* Release Date */}
+                    <VStack align="stretch" gap={2}>
+                      <PersianDatePicker
+                        label="تاریخ انتشار *"
+                        value={formData.releaseAt}
+                        onChange={(value) => handleInputChange('releaseAt', value)}
+                        placeholder="تاریخ انتشار را انتخاب کنید"
+                        errorMessage={validationErrors.releaseAt}
+                      />
+                    </VStack>
+
+                    {/* Due Date */}
+                    <VStack align="stretch" gap={2}>
+                      <PersianDatePicker
+                        label="تاریخ تحویل *"
+                        value={formData.dueAt}
+                        onChange={(value) => handleInputChange('dueAt', value)}
+                        placeholder="تاریخ تحویل را انتخاب کنید"
+                        errorMessage={validationErrors.dueAt}
+                      />
+                    </VStack>
+
+                    {/* Allow Late Submissions */}
+                    <GridItem colSpan={{ base: 1, md: 2 }}>
+                      <HStack justify="space-between" align="center">
+                        <VStack align="stretch" gap={1}>
+                          <Text fontWeight="medium" color={textColor}>اجازه تحویل دیرهنگام</Text>
+                          <Text fontSize="sm" color="gray.500">دانشجویان می‌توانند پس از مهلت مقرر نیز تکلیف ارسال کنند</Text>
+                        </VStack>
+                        <input
+                          type="checkbox"
+                          checked={formData.allowLate}
+                          onChange={(e: any) => handleInputChange('allowLate', e.target.checked)}
+                          style={{ transform: 'scale(1.2)' }}
+                        />
+                      </HStack>
+                    </GridItem>
+
+                    {/* Late Due Date */}
+                    {formData.allowLate && (
+                      <GridItem colSpan={{ base: 1, md: 2 }}>
+                        <VStack align="stretch" gap={2}>
+                          <PersianDatePicker
+                            label="تاریخ تحویل دیرهنگام *"
+                            value={formData.lateDueAt}
+                            onChange={(value) => handleInputChange('lateDueAt', value)}
+                            placeholder="تاریخ تحویل دیرهنگام را انتخاب کنید"
+                            errorMessage={validationErrors.lateDueAt}
+                          />
+                        </VStack>
+                      </GridItem>
+                    )}
+                  </Grid>
+                </VStack>
+              </Box>
+
+              {/* Time Limit & Points */}
+              <Box marginBottom={10} bg={sectionBg} p={6} borderRadius="lg" border="1px" borderColor={borderColor}>
+                <VStack align="stretch" gap={6}>
+                  <HStack gap={3} mb={2}>
+                    <Icon as={FiClock} color="orange.500" boxSize={5} />
+                    <Heading size="md" color={textColor}>محدودیت زمانی و امتیاز</Heading>
+                  </HStack>
+                  
+                  <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={6}>
+                    {/* Time Limit */}
+                    <VStack align="stretch" gap={4}>
+                      <HStack justify="space-between" align="center">
+                        <VStack align="stretch" gap={1}>
+                          <Text fontWeight="medium" color={textColor}>اعمال محدودیت زمانی</Text>
+                          <Text fontSize="sm" color="gray.500">محدود کردن زمان انجام تکلیف</Text>
+                        </VStack>
+                        <input
+                          type="checkbox"
+                          checked={formData.enforceTimeLimit}
+                          onChange={(e: any) => handleInputChange('enforceTimeLimit', e.target.checked)}
+                          style={{ transform: 'scale(1.2)' }}
+                        />
+                      </HStack>
+
+                      {formData.enforceTimeLimit && (
+                        <VStack align="stretch" gap={2}>
+                          <Text fontWeight="medium" color={textColor}>محدودیت زمانی (دقیقه)</Text>
+                          <Input
+                            type="number"
+                            value={formData.timeLimitMinutes}
+                            onChange={(e: any) => handleInputChange('timeLimitMinutes', parseInt(e.target.value) || 0)}
+                            min={1}
+                            max={1440}
+                            size="lg"
+                          />
+                </VStack>
               )}
+                    </VStack>
+
+                    {/* Points */}
+                    <VStack align="stretch" gap={2}>
+                      <Text fontWeight="medium" color={textColor}>امتیاز کل تکلیف</Text>
+                      <Input
+                        type="number"
+                        value={formData.totalPoints}
+                        onChange={(e: any) => handleInputChange('totalPoints', parseInt(e.target.value) || 0)}
+                        min={1}
+                        max={1000}
+                        size="lg"
+                      />
+                    </VStack>
+                  </Grid>
+                </VStack>
+              </Box>
             </VStack>
           </VStack>
           
