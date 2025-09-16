@@ -154,7 +154,7 @@ const CreateAssignmentMerged = () => {
       formDataToSend.append('is_published', 'false');
       formDataToSend.append('type', 'homework');
 
-      await api.post('/assignments/', formDataToSend, {
+      await api.post('/api/assignments/', formDataToSend, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 

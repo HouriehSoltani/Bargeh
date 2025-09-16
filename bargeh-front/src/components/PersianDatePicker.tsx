@@ -51,6 +51,7 @@ const PersianDatePicker: React.FC<PersianDatePickerProps> = ({
       )}
       <Box>
         <DatePicker
+          key={`datepicker-${value || 'empty'}`}
           date={getJalaliDate(value)}
           onChange={handleDateChange}
           placeholder="تاریخ و زمان را انتخاب کنید"

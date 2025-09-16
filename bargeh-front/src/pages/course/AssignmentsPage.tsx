@@ -23,7 +23,7 @@ const AssignmentsPage = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const { course, isLoading, error } = useCourse(courseId);
-  const { assignmentCount, isLoading: assignmentsLoading } = useAssignments(courseId);
+  const { assignments, assignmentCount, isLoading: assignmentsLoading } = useAssignments(courseId);
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
   const subtleText = useColorModeValue("gray.600", "gray.300");
@@ -144,186 +144,92 @@ const AssignmentsPage = () => {
                     </Box>
                   </Box>
                   <Box as="tbody">
-                    {/* Demo Assignment Rows */}
-                    <Box 
-                      as="tr" 
-                      borderBottom="1px" 
-                      borderColor={borderColor}
-                      _hover={{ bg: tableRowHover }}
-                    >
-                      <Box as="td" p={3} color={textColor} fontWeight="medium">
-                        تکلیف اول - برنامه‌نویسی
+                    {assignmentsLoading ? (
+                      <Box as="tr">
+                        <Box as="td" p={6} textAlign="center" gridColumn="span 9">
+                          <VStack>
+                            <Spinner size="md" color="blue.500" />
+                            <Text color={textColor}>در حال بارگذاری تکالیف...</Text>
+                          </VStack>
+                        </Box>
                       </Box>
-                      <Box as="td" p={3} color={textColor} fontWeight="medium">
-                        ۲۰
+                    ) : assignments.length === 0 ? (
+                      <Box as="tr">
+                        <Box as="td" p={6} textAlign="center" gridColumn="span 9">
+                          <VStack>
+                            <Text color={subtleText} fontSize="lg">هیچ تکلیفی یافت نشد</Text>
+                            <Text color={subtleText} fontSize="sm">برای شروع، اولین تکلیف را ایجاد کنید</Text>
+                          </VStack>
+                        </Box>
                       </Box>
-                      <Box as="td" p={3} color={subtleText}>
-                        ۱۵ خرداد
-                      </Box>
-                      <Box as="td" p={3} color={subtleText}>
-                        ۳۰ خرداد
-                      </Box>
-                      <Box as="td" p={3} color={textColor}>
-                        ۱۸
-                      </Box>
-                      <Box as="td" p={3}>
-                        <VStack align="start" gap={1}>
-                          <Box
-                            width="100px"
-                            height="6px"
-                            bg={progressBg}
-                            borderRadius="md"
-                            position="relative"
-                            overflow="hidden"
-                          >
-                            <Box
-                              width="90%"
-                              height="100%"
-                              bg="blue.500"
-                              borderRadius="md"
-                            />
-                          </Box>
-                          <Text fontSize="xs" color={subtleText}>۹۰٪</Text>
-                        </VStack>
-                      </Box>
-                      <Box as="td" p={3} textAlign="center">
-                        <Icon as={FiCircle} color="green.500" />
-                      </Box>
-                      <Box as="td" p={3} textAlign="center">
-                        <Badge colorScheme="green" variant="subtle" fontSize="xs">
-                          فعال
-                        </Badge>
-                      </Box>
-                      <Box as="td" p={3} textAlign="center">
-                        <IconButton
-                          variant="ghost"
-                          size="sm"
-                          aria-label="عملیات"
+                    ) : (
+                      assignments.map((assignment) => (
+                        <Box 
+                          key={assignment.id}
+                          as="tr" 
+                          borderBottom="1px" 
+                          borderColor={borderColor}
+                          _hover={{ bg: tableRowHover }}
                         >
-                          <Icon as={FiMoreVertical} />
-                        </IconButton>
-                      </Box>
-                    </Box>
-                    
-                    <Box 
-                      as="tr" 
-                      borderBottom="1px" 
-                      borderColor={borderColor}
-                      _hover={{ bg: tableRowHover }}
-                    >
-                      <Box as="td" p={3} color={textColor} fontWeight="medium">
-                        تکلیف دوم - الگوریتم
-                      </Box>
-                      <Box as="td" p={3} color={textColor} fontWeight="medium">
-                        ۲۵
-                      </Box>
-                      <Box as="td" p={3} color={subtleText}>
-                        ۲۰ خرداد
-                      </Box>
-                      <Box as="td" p={3} color={subtleText}>
-                        ۵ تیر
-                      </Box>
-                      <Box as="td" p={3} color={textColor}>
-                        ۱۵
-                      </Box>
-                      <Box as="td" p={3}>
-                        <VStack align="start" gap={1}>
-                          <Box
-                            width="100px"
-                            height="6px"
-                            bg={progressBg}
-                            borderRadius="md"
-                            position="relative"
-                            overflow="hidden"
-                          >
-                            <Box
-                              width="60%"
-                              height="100%"
-                              bg="orange.500"
-                              borderRadius="md"
-                            />
+                          <Box as="td" p={3} color={textColor} fontWeight="medium">
+                            {assignment.title}
                           </Box>
-                          <Text fontSize="xs" color={subtleText}>۶۰٪</Text>
-                        </VStack>
-                      </Box>
-                      <Box as="td" p={3} textAlign="center">
-                        <Icon as={FiCircle} color="orange.500" />
-                      </Box>
-                      <Box as="td" p={3} textAlign="center">
-                        <Badge colorScheme="orange" variant="subtle" fontSize="xs">
-                          در حال تصحیح
-                        </Badge>
-                      </Box>
-                      <Box as="td" p={3} textAlign="center">
-                        <IconButton
-                          variant="ghost"
-                          size="sm"
-                          aria-label="عملیات"
-                        >
-                          <Icon as={FiMoreVertical} />
-                        </IconButton>
-                      </Box>
-                    </Box>
-                    
-                    <Box 
-                      as="tr" 
-                      borderBottom="1px" 
-                      borderColor={borderColor}
-                      _hover={{ bg: tableRowHover }}
-                    >
-                      <Box as="td" p={3} color={textColor} fontWeight="medium">
-                        پروژه نهایی
-                      </Box>
-                      <Box as="td" p={3} color={textColor} fontWeight="medium">
-                        ۵۰
-                      </Box>
-                      <Box as="td" p={3} color={subtleText}>
-                        ۱ تیر
-                      </Box>
-                      <Box as="td" p={3} color={subtleText}>
-                        ۲۰ تیر
-                      </Box>
-                      <Box as="td" p={3} color={textColor}>
-                        ۱۲
-                      </Box>
-                      <Box as="td" p={3}>
-                        <VStack align="start" gap={1}>
-                          <Box
-                            width="100px"
-                            height="6px"
-                            bg={progressBg}
-                            borderRadius="md"
-                            position="relative"
-                            overflow="hidden"
-                          >
-                            <Box
-                              width="0%"
-                              height="100%"
-                              bg="red.500"
-                              borderRadius="md"
-                            />
+                          <Box as="td" p={3} color={textColor} fontWeight="medium">
+                            {assignment.total_points}
                           </Box>
-                          <Text fontSize="xs" color={subtleText}>۰٪</Text>
-                        </VStack>
-                      </Box>
-                      <Box as="td" p={3} textAlign="center">
-                        <Icon as={FiCircle} color={subtleText} />
-                      </Box>
-                      <Box as="td" p={3} textAlign="center">
-                        <Badge colorScheme="red" variant="subtle" fontSize="xs">
-                          منتشر نشده
-                        </Badge>
-                      </Box>
-                      <Box as="td" p={3} textAlign="center">
-                        <IconButton
-                          variant="ghost"
-                          size="sm"
-                          aria-label="عملیات"
-                        >
-                          <Icon as={FiMoreVertical} />
-                        </IconButton>
-                      </Box>
-                    </Box>
+                          <Box as="td" p={3} color={subtleText}>
+                            {new Date(assignment.created_at).toLocaleDateString('fa-IR')}
+                          </Box>
+                          <Box as="td" p={3} color={subtleText}>
+                            {assignment.due_at ? new Date(assignment.due_at).toLocaleDateString('fa-IR') : 'تعیین نشده'}
+                          </Box>
+                          <Box as="td" p={3} color={textColor}>
+                            ۰
+                          </Box>
+                          <Box as="td" p={3}>
+                            <VStack align="start" gap={1}>
+                              <Box
+                                width="100px"
+                                height="6px"
+                                bg={progressBg}
+                                borderRadius="md"
+                                position="relative"
+                                overflow="hidden"
+                              >
+                                <Box
+                                  width="0%"
+                                  height="100%"
+                                  bg="gray.500"
+                                  borderRadius="md"
+                                />
+                              </Box>
+                              <Text fontSize="xs" color={subtleText}>۰٪</Text>
+                            </VStack>
+                          </Box>
+                          <Box as="td" p={3} textAlign="center">
+                            <Icon as={FiCircle} color={assignment.is_published ? "green.500" : "gray.400"} />
+                          </Box>
+                          <Box as="td" p={3} textAlign="center">
+                            <Badge 
+                              colorScheme={assignment.is_published ? "green" : "gray"} 
+                              variant="subtle" 
+                              fontSize="xs"
+                            >
+                              {assignment.is_published ? "منتشر شده" : "منتشر نشده"}
+                            </Badge>
+                          </Box>
+                          <Box as="td" p={3} textAlign="center">
+                            <IconButton
+                              variant="ghost"
+                              size="sm"
+                              aria-label="عملیات"
+                            >
+                              <Icon as={FiMoreVertical} />
+                            </IconButton>
+                          </Box>
+                        </Box>
+                      ))
+                    )}
                   </Box>
                 </Box>
             </Box>
