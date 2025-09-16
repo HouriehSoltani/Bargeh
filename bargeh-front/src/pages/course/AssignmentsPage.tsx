@@ -10,16 +10,18 @@ import {
   Spinner, 
   HStack,
   Badge,
-  IconButton
+  IconButton,
+  Button
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
-import { FiChevronUp, FiChevronDown, FiMoreVertical, FiCircle } from "react-icons/fi";
-import { useParams } from "react-router-dom";
+import { FiChevronUp, FiChevronDown, FiMoreVertical, FiCircle, FiPlus } from "react-icons/fi";
+import { useParams, useNavigate } from "react-router-dom";
 import { useCourse } from "@/hooks/useCourse";
 import { useAssignments } from "@/hooks/useAssignments";
 
 const AssignmentsPage = () => {
   const { courseId } = useParams<{ courseId: string }>();
+  const navigate = useNavigate();
   const { course, isLoading, error } = useCourse(courseId);
   const { assignmentCount, isLoading: assignmentsLoading } = useAssignments(courseId);
   const bgColor = useColorModeValue("white", "gray.900");
@@ -74,7 +76,7 @@ const AssignmentsPage = () => {
         <Box bg={bgColor} minH="100vh" p={{ base: 4, md: 6 }}>
           <VStack align="stretch" gap={6}>
             {/* Assignments Header */}
-            <Box>
+            <HStack justify="space-between" align="center">
               <Heading size="xl" color={textColor} fontWeight="bold">
                 {assignmentsLoading ? (
                   <HStack>
@@ -85,7 +87,15 @@ const AssignmentsPage = () => {
                   `${assignmentCount} تکلیف`
                 )}
             </Heading>
-            </Box>
+              
+              <Button
+                colorScheme="blue"
+                onClick={() => navigate(`/courses/${courseId}/assignments/new`)}
+              >
+                <Icon as={FiPlus} mr={2} />
+                ایجاد تکلیف
+              </Button>
+            </HStack>
             
             {/* Assignments Table */}
             <VStack align="stretch" gap={4}>

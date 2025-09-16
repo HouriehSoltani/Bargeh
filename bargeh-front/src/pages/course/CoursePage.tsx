@@ -15,11 +15,12 @@ import {
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
 import { FiPlus, FiChevronUp, FiChevronDown, FiMoreVertical, FiCircle } from "react-icons/fi";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useCourse } from "@/hooks/useCourse";
 
 const CoursePage = () => {
   const { courseId } = useParams<{ courseId: string }>();
+  const navigate = useNavigate();
   const { course, isLoading, error } = useCourse(courseId);
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
@@ -209,7 +210,12 @@ const CoursePage = () => {
                     <Text color={subtleText} fontSize="lg">
                       هنوز هیچ تکلیفی ایجاد نشده است
                     </Text>
-                    <Button paddingLeft={2} colorScheme="teal" size="sm">
+                    <Button 
+                      paddingLeft={2} 
+                      colorScheme="teal" 
+                      size="sm"
+                      onClick={() => navigate(`/courses/${courseId}/assignments/new`)}
+                    >
                       <Icon as={FiPlus} mr={2} />
                       ایجاد تکلیف
                     </Button>

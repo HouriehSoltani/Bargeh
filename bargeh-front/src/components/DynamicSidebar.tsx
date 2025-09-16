@@ -34,7 +34,13 @@ const DynamicSidebar = ({
 
   const isActive = (path: string) => {
     // Handle exact matches
-    if (location.pathname === path) return true;
+    if (location.pathname === path) {
+      return true;
+    }
+    // Check if the navigation path ends with 'assignments' and current path starts with that path
+    if (path.endsWith('/assignments') && location.pathname.startsWith(path)) {
+      return true;
+    }
     
     // Handle course-specific routes (e.g., /courses/3/assignments should match /courses/assignments)
     if (path.startsWith('/courses/') && location.pathname.startsWith('/courses/')) {
@@ -249,3 +255,4 @@ const DynamicSidebar = ({
 };
 
 export default DynamicSidebar;
+
