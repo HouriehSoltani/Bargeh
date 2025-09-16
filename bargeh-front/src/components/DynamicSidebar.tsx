@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { getNavigationConfig, type SidebarConfig } from "@/config/navigation";
 import { FiUser, FiLogIn, FiLogOut } from "react-icons/fi";
+import { useEffect, useState } from "react";
 
 interface DynamicSidebarProps {
   config?: SidebarConfig;
@@ -28,6 +29,29 @@ const DynamicSidebar = ({
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
+  const [sidebarHeight, setSidebarHeight] = useState("100vh");
+
+  useEffect(() => {
+    const updateHeight = () => {
+      const documentHeight = Math.max(
+        document.body.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.clientHeight,
+        document.documentElement.scrollHeight,
+        document.documentElement.offsetHeight
+      );
+      setSidebarHeight(`${documentHeight}px`);
+    };
+
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    window.addEventListener('scroll', updateHeight);
+
+    return () => {
+      window.removeEventListener('resize', updateHeight);
+      window.removeEventListener('scroll', updateHeight);
+    };
+  }, []);
 
   // Get navigation config based on current path if not provided
   const navigationConfig = config || getNavigationConfig(location.pathname, courseId);
@@ -82,10 +106,11 @@ const DynamicSidebar = ({
       bg={bgColor}
       borderLeft="1px solid"
       borderColor={borderColor}
-      h="100vh"
       p={4}
       position="sticky"
       top={0}
+      h={sidebarHeight}
+      overflowY="auto"
     >
       <VStack gap={6} align="stretch">
         {/* User Info (if authenticated and on home page) */}

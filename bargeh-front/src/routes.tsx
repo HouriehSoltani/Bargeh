@@ -9,8 +9,7 @@ import AssignmentsPage from "./pages/course/AssignmentsPage";
 import RosterPage from "./pages/course/RosterPage";
 import ExtensionsPage from "./pages/course/ExtensionsPage";
 import SettingsPage from "./pages/course/SettingsPage";
-import CreateAssignment from "./pages/assignments/CreateAssignment";
-import HomeworkCreateForm from "./pages/assignments/HomeworkCreateForm";
+import CreateAssignmentMerged from "./pages/assignments/CreateAssignmentMerged";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const router = createBrowserRouter([
@@ -35,8 +34,7 @@ const router = createBrowserRouter([
       { path: "courses", element: <HomePage /> },
       { path: "courses/:courseId", element: <CoursePage /> },
       { path: "courses/:courseId/assignments", element: <AssignmentsPage /> },
-      { path: "courses/:courseId/assignments/new", element: <CreateAssignment /> },
-      { path: "courses/:courseId/assignments/new/homework", element: <HomeworkCreateForm /> },
+      { path: "courses/:courseId/assignments/new", element: <CreateAssignmentMerged /> },
       { path: "courses/:courseId/roster", element: <RosterPage /> },
       { path: "courses/:courseId/extensions", element: <ExtensionsPage /> },
       { path: "courses/:courseId/settings", element: <SettingsPage /> },
