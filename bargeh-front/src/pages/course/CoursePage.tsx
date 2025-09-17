@@ -6,7 +6,6 @@ import {
   Heading, 
   Text, 
   VStack, 
-  Button, 
   Icon, 
   Spinner, 
   HStack,
@@ -14,14 +13,15 @@ import {
   IconButton
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
-import { FiPlus, FiChevronUp, FiChevronDown, FiMoreVertical, FiCircle } from "react-icons/fi";
-import { useParams, useNavigate } from "react-router-dom";
+import { FiChevronUp, FiChevronDown, FiMoreVertical, FiCircle } from "react-icons/fi";
+import { useParams } from "react-router-dom";
 import { useCourse } from "@/hooks/useCourse";
+import { useAssignments } from "@/hooks/useAssignments";
 
 const CoursePage = () => {
   const { courseId } = useParams<{ courseId: string }>();
-  const navigate = useNavigate();
   const { course, isLoading, error } = useCourse(courseId);
+  const { assignments, isLoading: assignmentsLoading } = useAssignments(courseId);
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
   const subtleText = useColorModeValue("gray.600", "gray.300");
@@ -144,83 +144,92 @@ const CoursePage = () => {
                     </Box>
                   </Box>
                   <Box as="tbody">
-                    {/* Demo Assignment Row */}
-                    <Box 
-                      as="tr" 
-                      borderBottom="1px" 
-                      borderColor={borderColor}
-                      _hover={{ bg: tableRowHover }}
-                    >
-                      <Box as="td" p={3} color={textColor} fontWeight="medium">
-                        تکلیف نمونه
+                    {assignmentsLoading ? (
+                      <Box as="tr">
+                        <Box as="td" p={6} textAlign="center" gridColumn="span 8">
+                          <VStack>
+                            <Spinner size="md" color="blue.500" />
+                            <Text color={textColor}>در حال بارگذاری تکالیف...</Text>
+                          </VStack>
+                        </Box>
                       </Box>
-                      <Box as="td" p={3} color={subtleText}>
-                        -
+                    ) : assignments.length === 0 ? (
+                      <Box as="tr">
+                        <Box as="td" p={6} textAlign="center" gridColumn="span 8">
+                          <VStack>
+                            <Text color={subtleText} fontSize="lg">هیچ تکلیف فعالی یافت نشد</Text>
+                            <Text color={subtleText} fontSize="sm">برای شروع، اولین تکلیف را ایجاد کنید</Text>
+                          </VStack>
+                        </Box>
                       </Box>
-                      <Box as="td" p={3} color={subtleText}>
-                        ۳۰ خرداد
-                      </Box>
-                      <Box as="td" p={3} color={textColor}>
-                        ۲۰
-                      </Box>
-                      <Box as="td" p={3}>
-                        <VStack align="start" gap={1}>
-                          <Box
-                            width="100px"
-                            height="6px"
-                            bg={progressBg}
-                            borderRadius="md"
-                            position="relative"
-                            overflow="hidden"
-                          >
-                            <Box
-                              width="0%"
-                              height="100%"
-                              bg="blue.500"
-                              borderRadius="md"
-                            />
-                          </Box>
-                          <Text fontSize="xs" color={subtleText}>۰٪</Text>
-                        </VStack>
-                      </Box>
-                      <Box as="td" p={3} textAlign="center">
-                        <Icon as={FiCircle} color={subtleText} />
-                      </Box>
-                      <Box as="td" p={3} textAlign="center">
-                        <Badge colorScheme="green" variant="subtle" fontSize="xs">
-                          فعال
-                        </Badge>
-                      </Box>
-                      <Box as="td" p={3} textAlign="center">
-                        <IconButton
-                          variant="ghost"
-                          size="sm"
-                          aria-label="عملیات"
+                    ) : (
+                      assignments.map((assignment) => (
+                        <Box 
+                          key={assignment.id}
+                          as="tr" 
+                          borderBottom="1px" 
+                          borderColor={borderColor}
+                          _hover={{ bg: tableRowHover }}
                         >
-                          <Icon as={FiMoreVertical} />
-                        </IconButton>
-                      </Box>
-                    </Box>
+                          <Box as="td" p={3} color={textColor} fontWeight="medium">
+                            {assignment.title}
+                          </Box>
+                          <Box as="td" p={3} color={subtleText}>
+                            {new Date(assignment.created_at).toLocaleDateString('fa-IR')}
+                          </Box>
+                          <Box as="td" p={3} color={subtleText}>
+                            {assignment.due_at ? new Date(assignment.due_at).toLocaleDateString('fa-IR') : 'تعیین نشده'}
+                          </Box>
+                          <Box as="td" p={3} color={textColor}>
+                            ۰
+                          </Box>
+                          <Box as="td" p={3}>
+                            <VStack align="start" gap={1}>
+                              <Box
+                                width="100px"
+                                height="6px"
+                                bg={progressBg}
+                                borderRadius="md"
+                                position="relative"
+                                overflow="hidden"
+                              >
+                                <Box
+                                  width="0%"
+                                  height="100%"
+                                  bg="gray.500"
+                                  borderRadius="md"
+                                />
+                              </Box>
+                              <Text fontSize="xs" color={subtleText}>۰٪</Text>
+                            </VStack>
+                          </Box>
+                          <Box as="td" p={3} textAlign="center">
+                            <Icon as={FiCircle} color={assignment.is_published ? "green.500" : "gray.400"} />
+                          </Box>
+                          <Box as="td" p={3} textAlign="center">
+                            <Badge 
+                              colorScheme={assignment.is_published ? "green" : "gray"} 
+                              variant="subtle" 
+                              fontSize="xs"
+                            >
+                              {assignment.is_published ? "منتشر شده" : "فعال"}
+                            </Badge>
+                          </Box>
+                          <Box as="td" p={3} textAlign="center">
+                            <IconButton
+                              variant="ghost"
+                              size="sm"
+                              aria-label="عملیات"
+                            >
+                              <Icon as={FiMoreVertical} />
+                            </IconButton>
+                          </Box>
+                        </Box>
+                      ))
+                    )}
                   </Box>
                 </Box>
               </Box>
-              {/* Empty State  */}
-                <Box textAlign="center" >
-                  <VStack gap={4}>
-                    <Text color={subtleText} fontSize="lg">
-                      هنوز هیچ تکلیفی ایجاد نشده است
-                    </Text>
-                    <Button 
-                      paddingLeft={2} 
-                      colorScheme="teal" 
-                      size="sm"
-                      onClick={() => navigate(`/courses/${courseId}/assignments/new`)}
-                    >
-                      <Icon as={FiPlus} mr={2} />
-                      ایجاد تکلیف
-                    </Button>
-                  </VStack>
-                </Box>
             </VStack>
           </VStack>
         </Box>

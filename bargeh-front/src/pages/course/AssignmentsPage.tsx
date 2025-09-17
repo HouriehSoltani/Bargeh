@@ -73,11 +73,18 @@ const AssignmentsPage = () => {
       </GridItem>
 
       <GridItem area="main">
-        <Box bg={bgColor} minH="100vh" p={{ base: 4, md: 6 }}>
+        <Box bg={bgColor} minH="100vh" p={{ base: 4, md: 6 }} pb={24}>
           <VStack align="stretch" gap={6}>
             {/* Assignments Header */}
-            <HStack justify="space-between" align="center">
-              <Heading size="xl" color={textColor} fontWeight="bold">
+            <Box>
+              <Heading 
+                margin={5}
+                size="xl" 
+                color={textColor} 
+                fontWeight="bold"
+                fontFamily="inherit"
+                fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}
+              >
                 {assignmentsLoading ? (
                   <HStack>
                     <Spinner size="sm" />
@@ -86,16 +93,8 @@ const AssignmentsPage = () => {
                 ) : (
                   `${assignmentCount} تکلیف`
                 )}
-            </Heading>
-              
-              <Button
-                colorScheme="blue"
-                onClick={() => navigate(`/courses/${courseId}/assignments/new`)}
-              >
-                <Icon as={FiPlus} mr={2} />
-                ایجاد تکلیف
-              </Button>
-            </HStack>
+              </Heading>
+            </Box>
             
             {/* Assignments Table */}
             <VStack align="stretch" gap={4}>
@@ -237,6 +236,35 @@ const AssignmentsPage = () => {
           </VStack>
         </Box>
       </GridItem>
+      
+      {/* Bottom Action Bar */}
+      <Box
+        position="fixed"
+        bottom={0}
+        left={0}
+        right={0}
+        bg="gray.100"
+        borderTop="1px solid"
+        borderColor="gray.300"
+        p={{ base: 1, md: 2 }}
+        zIndex={10}
+        w="100%"
+      >
+        <HStack justify="flex-end" mx="auto" px={{ base: 4, md: 6 }}>
+          <Button
+            bg="#2E5BBA"
+            color="white"
+            size={{ base: "sm", md: "md" }}
+            paddingLeft={2}
+            _hover={{ bg: "#1E4A9A" }}
+            fontSize={{ base: "xs", md: "sm" }}
+            onClick={() => navigate(`/courses/${courseId}/assignments/new`)}
+          >
+            <Icon as={FiPlus} mr={2} />
+            ایجاد تکلیف
+          </Button>
+        </HStack>
+      </Box>
     </Grid>
   );
 };
