@@ -1,9 +1,10 @@
 import { Box, VStack, Button, Icon, Text, Heading, HStack } from "@chakra-ui/react";
+import { Menu } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { getNavigationConfig, type SidebarConfig } from "@/config/navigation";
-import { FiUser, FiLogIn, FiLogOut } from "react-icons/fi";
+import { FiUser, FiLogIn, FiLogOut, FiChevronDown, FiSettings } from "react-icons/fi";
 import { useEffect, useState } from "react";
 
 interface DynamicSidebarProps {
@@ -61,6 +62,12 @@ const DynamicSidebar = ({
     if (location.pathname === path) {
       return true;
     }
+    
+    // Handle home page - both '/' and '/courses' should be active on home page
+    if (path === '/' && (location.pathname === '/' || location.pathname === '/courses')) {
+      return true;
+    }
+    
     // Check if the navigation path ends with 'assignments' and current path starts with that path
     if (path.endsWith('/assignments') && location.pathname.startsWith(path)) {
       return true;
@@ -115,46 +122,115 @@ const DynamicSidebar = ({
       <VStack gap={6} align="stretch">
         {/* User Info (if authenticated and on home page) */}
         {isAuthenticated && user && (
-          <Box 
-            p={3} 
-            bg="white" 
-            borderRadius="md" 
-            border="1px solid" 
-            borderColor={borderColor}
-            cursor="pointer"
-            _hover={{ 
-              bg: "gray.50",
-              transform: "translateX(-2px)",
-              boxShadow: "sm"
-            }}
-            transition="all 0.2s"
-            onClick={() => navigate('/')}
-          >
-            <HStack gap={3}>
-              <Box 
-                w="32px" 
-                h="32px" 
-                borderRadius="full" 
-                bg="blue.500" 
-                display="flex" 
-                alignItems="center" 
-                justifyContent="center"
-                color="white"
-                fontSize="sm"
-                fontWeight="bold"
+          <Menu.Root>
+            <Menu.Trigger asChild>
+              <Box
+                p={4} 
+                bg={useColorModeValue("white", "gray.700")} 
+                borderRadius="lg" 
+                border="1px solid" 
+                borderColor={useColorModeValue("gray.200", "gray.600")}
+                cursor="pointer"
+                _hover={{ 
+                  bg: useColorModeValue("gray.50", "gray.600"),
+                  transform: "translateX(-3px)",
+                  boxShadow: "md",
+                  borderColor: useColorModeValue("blue.300", "blue.500")
+                }}
+                _active={{
+                  bg: useColorModeValue("gray.100", "gray.500")
+                }}
+                transition="all 0.3s ease"
+                dir="rtl"
               >
-                {(user.name || user.email || "U").charAt(0).toUpperCase()}
+                <HStack gap={3} justify="space-between" dir="rtl">
+                  <HStack gap={2}>
+                    <Icon as={FiChevronDown} color={useColorModeValue("gray.400", "gray.300")} />
+                    <Box 
+                      w="36px" 
+                      h="36px" 
+                      borderRadius="full" 
+                      bg="blue.500" 
+                      display="flex" 
+                      alignItems="center" 
+                      justifyContent="center"
+                      color="white"
+                      fontSize="sm"
+                      fontWeight="bold"
+                      boxShadow="sm"
+                    >
+                      {(user.name || user.email || "U").charAt(0).toUpperCase()}
+                    </Box>
+                  </HStack>
+                  <VStack align="start" gap={0} flex={1}>
+                    <Text fontSize="sm" fontWeight="semibold" color={useColorModeValue("gray.800", "gray.100")}>
+                      {user.name || user.email}
+                    </Text>
+                    <Text fontSize="xs" color={useColorModeValue("gray.500", "gray.400")}>
+                      {user.email}
+                    </Text>
+                  </VStack>
+                </HStack>
               </Box>
-              <VStack align="start" gap={0} flex={1}>
-                <Text fontSize="sm" fontWeight="medium" color="gray.700">
-                  {user.name || user.email}
-                </Text>
-                <Text fontSize="xs" color="gray.500">
-                  {user.email}
-                </Text>
-              </VStack>
-            </HStack>
-          </Box>
+            </Menu.Trigger>
+            <Menu.Content 
+              dir="rtl"
+              bg={useColorModeValue("white", "gray.700")}
+              border="1px solid"
+              borderColor={useColorModeValue("gray.200", "gray.600")}
+              borderRadius="lg"
+              boxShadow="xl"
+              minW="200px"
+              py={2}
+            >
+              <Menu.Item 
+                value="dashboard" 
+                onClick={() => navigate('/')}
+                bg="transparent"
+                cursor="pointer"
+                _hover={{ 
+                  bg: useColorModeValue("blue.50", "blue.900"),
+                  color: useColorModeValue("blue.700", "blue.200")
+                }}
+                _focus={{ 
+                  bg: useColorModeValue("blue.50", "blue.900"),
+                  color: useColorModeValue("blue.700", "blue.200")
+                }}
+                py={3}
+                px={4}
+                fontSize="sm"
+                fontWeight="medium"
+              >
+                <HStack gap={3} justify="space-between" w="full">
+                  <Text>داشبورد درس‌ها</Text>
+                  <Icon as={FiUser} />
+                </HStack>
+              </Menu.Item>
+              <Menu.Item 
+                value="profile" 
+                onClick={() => navigate('/profile')}
+                bg="transparent"
+                cursor="pointer"
+                _hover={{ 
+                  bg: useColorModeValue("blue.50", "blue.900"),
+                  color: useColorModeValue("blue.700", "blue.200")
+                }}
+                _focus={{ 
+                  bg: useColorModeValue("blue.50", "blue.900"),
+                  color: useColorModeValue("blue.700", "blue.200")
+                }}
+                py={3}
+                px={4}
+                fontSize="sm"
+                fontWeight="medium"
+              >
+                <HStack gap={3} justify="space-between" w="full">
+                  <Text>تنظیمات پروفایل</Text>
+                  <Icon as={FiSettings} />
+                </HStack>
+              </Menu.Item>
+            </Menu.Content>
+          </Menu.Root>
         )}
 
         {/* Course Info (if on course page) */}

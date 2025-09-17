@@ -100,6 +100,22 @@ export function getSortedPersianTerms(groupedCourses: Record<string, any[]>): st
 }
 
 /**
+ * Converts English term to Persian term
+ * @param englishTerm - English term like "fall", "winter", "spring", "summer"
+ * @returns Persian term
+ */
+export function convertEnglishTermToPersian(englishTerm: string): string {
+  const termMap: Record<string, string> = {
+    'fall': 'پاییز',
+    'winter': 'زمستان', 
+    'spring': 'بهار',
+    'summer': 'تابستان'
+  };
+  
+  return termMap[englishTerm] || englishTerm;
+}
+
+/**
  * Groups courses by term and year from database fields
  * @param courses - Array of courses with term and year properties
  * @returns Object with term-year as keys and courses as values
@@ -108,9 +124,10 @@ export function groupCoursesByTermYear(courses: any[]): Record<string, any[]> {
   const grouped: Record<string, any[]> = {};
 
   courses.forEach(course => {
-    const term = course.term || 'نامشخص';
+    const englishTerm = course.term || 'نامشخص';
+    const persianTerm = convertEnglishTermToPersian(englishTerm);
     const year = course.year || 1400;
-    const key = `${term} ${year}`;
+    const key = `${persianTerm} ${year}`;
 
     if (!grouped[key]) {
       grouped[key] = [];

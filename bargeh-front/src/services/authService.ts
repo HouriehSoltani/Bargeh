@@ -25,10 +25,11 @@ export interface UserProfile {
   id: number;
   email: string;
   name: string;
-  first_name: string;
-  last_name: string;
+  first_name?: string;
+  last_name?: string;
+  bio?: string;
   date_joined: string;
-  last_login: string;
+  last_login?: string;
 }
 
 // Authentication service methods

@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { type LoginRequest, type RegisterRequest, type UserProfile } from '@/services/authService';
+import { userService } from '@/services/userService';
 
 interface UseAuthReturn {
   user: UserProfile | null;
@@ -14,17 +15,34 @@ interface UseAuthReturn {
 }
 
 export const useAuth = (): UseAuthReturn => {
-  // AUTHENTICATION DISABLED - No authentication required
-  const [user] = useState<UserProfile | null>({
+  // Default mock user data
+  const defaultUser: UserProfile = {
     id: 1,
-    email: "user@example.com",
-    name: "Demo User",
-    first_name: "Demo",
-    last_name: "User",
-    date_joined: new Date().toISOString(),
-    last_login: new Date().toISOString(),
-  });
-  const [isLoading] = useState(false);
+    email: "demo@example.com",
+    name: "کاربر نمونه",
+    first_name: "کاربر",
+    last_name: "نمونه",
+    bio: "این یک کاربر نمونه است",
+    date_joined: "2024-01-01T00:00:00Z",
+    last_login: "2024-01-01T00:00:00Z"
+  };
+
+  // Load user data from localStorage or use default
+  const loadUserFromStorage = (): UserProfile => {
+    try {
+      const storedUser = localStorage.getItem('mock_user_profile');
+      if (storedUser) {
+        return JSON.parse(storedUser);
+      }
+    } catch (error) {
+      console.error('Error loading user from localStorage:', error);
+    }
+    return defaultUser;
+  };
+
+  // AUTHENTICATION DISABLED - No authentication required
+  const [user, setUser] = useState<UserProfile | null>(loadUserFromStorage());
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Always return authenticated (no auth required)
@@ -76,10 +94,24 @@ export const useAuth = (): UseAuthReturn => {
     return Promise.resolve();
   }, []);
 
-  const updateProfile = useCallback(async (_profileData: Partial<UserProfile>) => {
-    // BYPASSED FOR DEVELOPMENT - just log
-    return Promise.resolve();
-  }, []);
+  const updateProfile = useCallback(async (profileData: Partial<UserProfile>) => {
+    // In development mode, update the mock user data in localStorage
+    try {
+      const currentUser = user || defaultUser;
+      const updatedUser = { ...currentUser, ...profileData };
+      
+      // Save to localStorage
+      localStorage.setItem('mock_user_profile', JSON.stringify(updatedUser));
+      
+      // Update the state
+      setUser(updatedUser);
+      
+      console.log('Profile updated in localStorage:', updatedUser);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      throw error;
+    }
+  }, [user, defaultUser]);
 
   const clearError = useCallback(() => {
     setError(null);

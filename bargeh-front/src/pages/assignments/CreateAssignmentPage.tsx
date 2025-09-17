@@ -17,6 +17,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import DynamicSidebar from "@/components/DynamicSidebar";
 import PersianDatePicker from "@/components/PersianDatePicker";
 import { useCourse } from "@/hooks/useCourse";
+import { convertEnglishTermToPersian } from "@/utils/persianDate";
 import { useState, useRef } from "react";
 import { api } from "@/services/api";
 
@@ -219,7 +220,7 @@ const CreateAssignmentMerged = () => {
       <GridItem area="aside" display={{ base: "none", md: "block" }} alignSelf="stretch">
         <DynamicSidebar 
           courseTitle={course.title}
-          courseSubtitle={`${course.term} ${course.year}`}
+          courseSubtitle={`${convertEnglishTermToPersian(course.term)} ${course.year}`}
           instructor={course.instructor}
           courseId={courseId}
         />

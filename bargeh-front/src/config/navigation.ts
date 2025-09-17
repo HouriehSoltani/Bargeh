@@ -1,5 +1,4 @@
 import { 
-  FiHome, 
   FiBook, 
   FiSettings, 
   FiLogOut,
@@ -35,9 +34,8 @@ export const homeNavigationConfig: SidebarConfig = {
   sections: [
     {
       items: [
-        { icon: FiHome, label: "صفحه اصلی", href: '/' },
-        { icon: FiBook, label: "داشبورد درس‌ها", href: '/courses' },
-        { icon: FiSettings, label: "تنظیمات", href: '/settings' },
+        { icon: FiBook, label: "داشبورد درس‌ها", href: '/', path: '/' },
+        { icon: FiSettings, label: "تنظیمات پروفایل", href: '/profile', path: '/profile' },
       ]
     }
   ]

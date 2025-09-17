@@ -61,6 +61,11 @@ export const courseService = {
     return api.patch<CourseResponse>(API_CONFIG.ENDPOINTS.COURSE_SETTINGS(courseId), settings);
   },
 
+  // Update course (alias for updateCourseSettings)
+  updateCourse: async (courseId: number, courseData: Partial<CreateCourseRequest>): Promise<CourseResponse> => {
+    return api.patch<CourseResponse>(API_CONFIG.ENDPOINTS.COURSE_DETAIL(courseId), courseData);
+  },
+
   // Get course assignments
   getAssignments: async (courseId: number): Promise<unknown[]> => {
     return api.get<unknown[]>(API_CONFIG.ENDPOINTS.ASSIGNMENTS(courseId));

@@ -4,6 +4,7 @@ import { useColorModeValue } from "@/hooks/useColorMode";
 import { FiClock } from "react-icons/fi";
 import { useParams } from "react-router-dom";
 import { useCourse } from "@/hooks/useCourse";
+import { convertEnglishTermToPersian } from "@/utils/persianDate";
 
 const ExtensionsPage = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -47,7 +48,7 @@ const ExtensionsPage = () => {
       <GridItem area="aside" display={{ base: "none", md: "block" }}>
         <DynamicSidebar 
           courseTitle={course.title}
-          courseSubtitle={`${course.term} ${course.year}`}
+          courseSubtitle={`${convertEnglishTermToPersian(course.term)} ${course.year}`}
           instructor={course.instructor}
           courseId={courseId}
         />
@@ -64,7 +65,7 @@ const ExtensionsPage = () => {
                 </Heading>
                 <Box height="20px" width="1px" bg={subtleText} />
                 <Text color={subtleText} fontSize="lg">
-                  {course.term} {course.year}
+                  {convertEnglishTermToPersian(course.term)} {course.year}
                 </Text>
               </HStack>
               <Text color={subtleText} fontSize="sm">

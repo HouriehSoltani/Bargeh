@@ -95,19 +95,88 @@ const CourseDashboard = () => {
   return (
     <Box bg={bgColor} minH="100vh" p={6} position="relative" pb={24} fontFamily="inherit">
       <VStack align="start" mb={8}>
-
-          <Heading 
-            size="xl" 
-            color={textColor} 
-            fontWeight="bold"
-            fontFamily="inherit"
-            fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}
-          >
-            داشبورد درس‌ها
-          </Heading>
+        <Heading 
+          size="xl" 
+          color={textColor} 
+          fontWeight="bold"
+          fontFamily="inherit"
+          fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}
+        >
+          داشبورد درس‌ها
+        </Heading>
       </VStack>
 
-      <CourseGrid courses={courses} onCreateCourse={createDialog.onOpen} />
+      {courses.length === 0 ? (
+        <Box 
+          display="flex" 
+          alignItems="center" 
+          justifyContent="center" 
+          minH="60vh"
+          textAlign="center"
+        >
+          <VStack gap={6} maxW="500px">
+            <Box
+              bg={useColorModeValue("blue.50", "blue.900")}
+              borderRadius="full"
+              p={8}
+              boxShadow="lg"
+            >
+              <Icon as={FiFileText} boxSize={16} color="blue.500" />
+            </Box>
+            
+            <VStack gap={4}>
+              <Heading 
+                size="lg" 
+                color={textColor}
+                fontFamily="inherit"
+                fontSize={{ base: "lg", md: "xl", lg: "2xl" }}
+              >
+                خوش آمدید به برگه
+              </Heading>
+              
+              <Text 
+                color={useColorModeValue("gray.600", "gray.300")}
+                fontSize={{ base: "sm", md: "md" }}
+                lineHeight="1.6"
+                maxW="400px"
+              >
+                برای شروع کار، ابتدا یک درس جدید ایجاد کنید یا در یکی از درس‌های موجود ثبت‌نام کنید.
+              </Text>
+            </VStack>
+            
+            <HStack gap={4} pt={4}>
+              <Button
+                bg="#2E5BBA"
+                color="white"
+                size="md"
+                paddingLeft={4}
+                _hover={{ bg: "#1E4A9A" }}
+                onClick={createDialog.onOpen}
+              >
+                <Icon as={FiPlus} mr={2} />
+                ایجاد درس جدید
+              </Button>
+              
+              <Button
+                bg={bgColor}
+                variant="outline"
+                colorScheme="blue"
+                size="md"
+                paddingLeft={4}
+                borderColor="#4A90E2"
+                color="#4A90E2"
+                _hover={{ bg: "#4A90E2", color: "white" }}
+                onClick={enrollDialog.onOpen}
+              >
+                <Icon as={FiFileText} mr={2} />
+                ثبت‌نام در درس
+              </Button>
+            </HStack>
+          </VStack>
+        </Box>
+      ) : (
+        <CourseGrid courses={courses} onCreateCourse={createDialog.onOpen} />
+      )}
       
       {/* Bottom Action Bar */}
       <Box

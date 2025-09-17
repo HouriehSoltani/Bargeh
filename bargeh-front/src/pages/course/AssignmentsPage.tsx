@@ -18,6 +18,7 @@ import { FiChevronUp, FiChevronDown, FiMoreVertical, FiCircle, FiPlus } from "re
 import { useParams, useNavigate } from "react-router-dom";
 import { useCourse } from "@/hooks/useCourse";
 import { useAssignments } from "@/hooks/useAssignments";
+import { convertEnglishTermToPersian } from "@/utils/persianDate";
 
 const AssignmentsPage = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -66,7 +67,7 @@ const AssignmentsPage = () => {
       <GridItem area="aside" display={{ base: "none", md: "block" }}>
         <DynamicSidebar 
           courseTitle={course.title}
-          courseSubtitle={`${course.term} ${course.year}`}
+          courseSubtitle={`${convertEnglishTermToPersian(course.term)} ${course.year}`}
           instructor={course.instructor}
           courseId={courseId}
         />
@@ -154,10 +155,10 @@ const AssignmentsPage = () => {
                       </Box>
                     ) : assignments.length === 0 ? (
                       <Box as="tr">
-                        <Box as="td" p={6} textAlign="center" gridColumn="span 9">
+                        <Box as="td" p={6} textAlign="center" {...{ colSpan: 9 }}>
                           <VStack>
-                            <Text color={subtleText} fontSize="lg">هیچ تکلیفی یافت نشد</Text>
-                            <Text color={subtleText} fontSize="sm">برای شروع، اولین تکلیف را ایجاد کنید</Text>
+                            <Text color={subtleText} fontSize="lg">هیچ تکلیفی یافت نشد.</Text>
+                            <Text color={subtleText} fontSize="sm">برای شروع، اولین تکلیف را ایجاد کنید.</Text>
                           </VStack>
                         </Box>
                       </Box>

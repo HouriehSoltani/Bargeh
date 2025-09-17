@@ -10,6 +10,7 @@ import RosterPage from "./pages/course/RosterPage";
 import ExtensionsPage from "./pages/course/ExtensionsPage";
 import SettingsPage from "./pages/course/SettingsPage";
 import CreateAssignmentMerged from "./pages/assignments/CreateAssignmentPage";
+import ProfilePage from "./pages/ProfilePage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const router = createBrowserRouter([
@@ -38,6 +39,7 @@ const router = createBrowserRouter([
       { path: "courses/:courseId/roster", element: <RosterPage /> },
       { path: "courses/:courseId/extensions", element: <ExtensionsPage /> },
       { path: "courses/:courseId/settings", element: <SettingsPage /> },
+      { path: "profile", element: <ProfilePage /> },
     ],
   },
 ]);

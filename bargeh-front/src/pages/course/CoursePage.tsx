@@ -10,18 +10,21 @@ import {
   Spinner, 
   HStack,
   Badge,
-  IconButton
+  IconButton,
+  Button
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
-import { FiChevronUp, FiChevronDown, FiMoreVertical, FiCircle } from "react-icons/fi";
-import { useParams } from "react-router-dom";
+import { FiChevronUp, FiChevronDown, FiMoreVertical, FiCircle, FiPlus } from "react-icons/fi";
+import { useNavigate, useParams } from "react-router-dom";
 import { useCourse } from "@/hooks/useCourse";
 import { useAssignments } from "@/hooks/useAssignments";
+import { convertEnglishTermToPersian } from "@/utils/persianDate";
 
 const CoursePage = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const { course, isLoading, error } = useCourse(courseId);
   const { assignments, isLoading: assignmentsLoading } = useAssignments(courseId);
+  const navigate = useNavigate();
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
   const subtleText = useColorModeValue("gray.600", "gray.300");
@@ -64,7 +67,7 @@ const CoursePage = () => {
       <GridItem area="aside" display={{ base: "none", md: "block" }}>
         <DynamicSidebar 
           courseTitle={course.title}
-          courseSubtitle={`${course.term} ${course.year}`}
+          courseSubtitle={`${convertEnglishTermToPersian(course.term)} ${course.year}`}
           instructor={course.instructor}
           courseId={courseId}
         />
@@ -81,7 +84,7 @@ const CoursePage = () => {
                 </Heading>
                 <Box  height="20px" width="1px" bg={subtleText} />
                 <Text color={subtleText} fontSize="lg">
-                  {course.term} {course.year}
+                  {convertEnglishTermToPersian(course.term)} {course.year}
                 </Text>
               </HStack>
               <Text color={subtleText} fontSize="sm">
@@ -155,10 +158,21 @@ const CoursePage = () => {
                       </Box>
                     ) : assignments.length === 0 ? (
                       <Box as="tr">
-                        <Box as="td" p={6} textAlign="center" gridColumn="span 8">
+                        <Box as="td" p={6} textAlign="center" {...{ colSpan: 8 }}>
                           <VStack>
-                            <Text color={subtleText} fontSize="lg">هیچ تکلیف فعالی یافت نشد</Text>
-                            <Text color={subtleText} fontSize="sm">برای شروع، اولین تکلیف را ایجاد کنید</Text>
+                            <Text color={subtleText} fontSize="md">هیچ تکلیف فعالی یافت نشد.</Text>
+                            <Button
+                                bg="#2E5BBA"
+                                color="white"
+                                size={{ base: "xs", md: "xs" }}
+                                paddingLeft={2}
+                                _hover={{ bg: "#1E4A9A" }}
+                                fontSize={{ base: "xs", md: "sm" }}
+                                onClick={() => navigate(`/courses/${courseId}/assignments/new`)}
+                              >
+                                <Icon as={FiPlus} mr={2} />
+                                ایجاد تکلیف
+                              </Button>
                           </VStack>
                         </Box>
                       </Box>

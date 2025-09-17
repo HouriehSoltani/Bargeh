@@ -22,9 +22,9 @@ export const API_CONFIG = {
     CREATE_COURSE: '/api/courses/',
     
     // Assignments
-    ASSIGNMENTS: (courseId: number) => `/api/courses/${courseId}/assignments/`,
+    ASSIGNMENTS: (courseId: number) => `/api/assignments/course/${courseId}/`,
     ASSIGNMENT_DETAIL: (courseId: number, assignmentId: number) => 
-      `/api/courses/${courseId}/assignments/${assignmentId}/`,
+      `/api/assignments/${assignmentId}/`,
     
     // Roster
     ROSTER: (courseId: number) => `/api/courses/${courseId}/roster/`,
