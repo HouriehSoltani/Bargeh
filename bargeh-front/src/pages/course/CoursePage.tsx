@@ -9,22 +9,54 @@ import {
   Icon, 
   Spinner, 
   HStack,
-  Badge,
   IconButton,
-  Button
+  Button,
+  Menu
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
-import { FiChevronUp, FiChevronDown, FiMoreVertical, FiCircle, FiPlus } from "react-icons/fi";
+import { FiChevronUp, FiChevronDown, FiMoreVertical, FiPlus, FiCheck, FiSettings, FiTrash2 } from "react-icons/fi";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCourse } from "@/hooks/useCourse";
 import { useAssignments } from "@/hooks/useAssignments";
 import { convertEnglishTermToPersian } from "@/utils/persianDate";
+import { useState } from "react";
+import { assignmentService } from "@/services/assignmentService";
 
 const CoursePage = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const { course, isLoading, error } = useCourse(courseId);
   const { assignments, isLoading: assignmentsLoading } = useAssignments(courseId);
   const navigate = useNavigate();
+  
+  // State for delete modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [assignmentToDelete, setAssignmentToDelete] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Handler functions
+  const handleAssignmentSettings = (assignmentId: number) => {
+    navigate(`/courses/${courseId}/assignments/${assignmentId}/settings`);
+  };
+
+  const handleDeleteAssignment = (assignmentId: number) => {
+    setAssignmentToDelete(assignmentId);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!assignmentToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      await assignmentService.deleteAssignment(assignmentToDelete);
+      // Refresh assignments list by reloading the page
+      window.location.reload();
+    } catch (error) {
+      console.error('Error deleting assignment:', error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
   const subtleText = useColorModeValue("gray.600", "gray.300");
@@ -142,7 +174,7 @@ const CoursePage = () => {
                         </HStack>
                       </Box>
                       <Box as="th" p={3} textAlign="center" color={textColor} fontWeight="semibold">انتشار</Box>
-                      <Box as="th" p={3} textAlign="center" color={textColor} fontWeight="semibold">بازبینی</Box>
+                      <Box as="th" p={3} textAlign="center" color={textColor} fontWeight="semibold">درخواست بازبینی</Box>
                       <Box as="th" p={3} textAlign="center" width="50px"></Box>
                     </Box>
                   </Box>
@@ -218,25 +250,89 @@ const CoursePage = () => {
                             </VStack>
                           </Box>
                           <Box as="td" p={3} textAlign="center">
-                            <Icon as={FiCircle} color={assignment.is_published ? "green.500" : "gray.400"} />
+                            <Box
+                              w="24px"
+                              h="24px"
+                              borderRadius="full"
+                              bg={assignment.is_published ? "blue.500" : "gray.300"}
+                              display="flex"
+                              alignItems="center"
+                              justifyContent="center"
+                              mx="auto"
+                            >
+                              {assignment.is_published && (
+                                <Icon as={FiCheck} color="white" boxSize={3} />
+                              )}
+                            </Box>
                           </Box>
                           <Box as="td" p={3} textAlign="center">
-                            <Badge 
-                              colorScheme={assignment.is_published ? "green" : "gray"} 
-                              variant="subtle" 
-                              fontSize="xs"
+                            <Text 
+                              color={assignment.regrade_enabled ? "blue.500" : "red.500"}
+                              fontWeight="medium"
+                              fontSize="sm"
                             >
-                              {assignment.is_published ? "منتشر شده" : "فعال"}
-                            </Badge>
+                              {assignment.regrade_enabled ? "ON" : "OFF"}
+                            </Text>
                           </Box>
-                          <Box as="td" p={3} textAlign="center">
-                            <IconButton
-                              variant="ghost"
-                              size="sm"
-                              aria-label="عملیات"
-                            >
-                              <Icon as={FiMoreVertical} />
-                            </IconButton>
+                          <Box as="td" p={3} textAlign="center" position="absolute" >
+                            <Menu.Root>
+                              <Menu.Trigger asChild>
+                                <IconButton
+                                  variant="ghost"
+                                  size="sm"
+                                  aria-label="عملیات"
+                                  _hover={{ bg: "gray.100" }}
+                                >
+                                  <Icon as={FiMoreVertical} />
+                                </IconButton>
+                              </Menu.Trigger>
+                              <Menu.Content 
+                                bg={useColorModeValue("white", "gray.700")}
+                                border="1px solid"
+                                borderColor={useColorModeValue("gray.200", "gray.600")}
+                                borderRadius="md"
+                                boxShadow="lg"
+                                minW="180px"
+                                py={1}
+                                zIndex={1000}
+                                dir="rtl"
+                                position="absolute"
+                                left={0}
+                              >
+                                <Menu.Item 
+                                  value="settings"
+                                  onClick={() => handleAssignmentSettings(assignment.id)}
+                                  bg="transparent"
+                                  cursor="pointer"
+                                  _hover={{ bg: useColorModeValue("blue.50", "blue.900") }}
+                                  _focus={{ bg: useColorModeValue("blue.50", "blue.900") }}
+                                  py={2}
+                                  px={3}
+                                  fontSize="sm"
+                                >
+                                  <HStack w="full">
+                                    <Icon as={FiSettings} color="blue.500" />
+                                    <Text color="blue.500">تنظیمات تکلیف</Text>
+                                  </HStack>
+                                </Menu.Item>
+                                <Menu.Item 
+                                  value="delete"
+                                  onClick={() => handleDeleteAssignment(assignment.id)}
+                                  bg="transparent"
+                                  cursor="pointer"
+                                  _hover={{ bg: useColorModeValue("red.50", "red.900") }}
+                                  _focus={{ bg: useColorModeValue("red.50", "red.900") }}
+                                  py={2}
+                                  px={3}
+                                  fontSize="sm"
+                                >
+                                  <HStack w="full">
+                                    <Icon as={FiTrash2} color="red.500" />
+                                    <Text color="red.500">حذف تکلیف</Text>
+                                  </HStack>
+                                </Menu.Item>
+                              </Menu.Content>
+                            </Menu.Root>
                           </Box>
                         </Box>
                       ))
@@ -248,6 +344,62 @@ const CoursePage = () => {
           </VStack>
         </Box>
       </GridItem>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <Box
+          position="fixed"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          bg="blackAlpha.600"
+          zIndex={1000}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Box
+            bg={useColorModeValue("white", "gray.800")}
+            borderRadius="lg"
+            p={6}
+            maxW="400px"
+            w="90%"
+            boxShadow="xl"
+          >
+            <VStack align="stretch" gap={4}>
+              <Text fontSize="lg" fontWeight="bold" color={textColor} textAlign="center">
+                حذف تکلیف
+              </Text>
+              <Text fontSize="sm" color="red.500" textAlign="center">
+                آیا مطمئن هستید که می‌خواهید این تکلیف را حذف کنید؟
+              </Text>
+              <HStack justify="center" gap={3} mt={4}>
+                <Button
+                  paddingX={2}
+                  variant="outline"
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setAssignmentToDelete(null);
+                  }}
+                  disabled={isDeleting}
+                >
+                  انصراف
+                </Button>
+                <Button
+                  paddingX={2}
+                  colorScheme="red"
+                  onClick={handleConfirmDelete}
+                  loading={isDeleting}
+                  loadingText="در حال حذف..."
+                >
+                  حذف
+                </Button>
+              </HStack>
+            </VStack>
+          </Box>
+        </Box>
+      )}
     </Grid>
   );
 };

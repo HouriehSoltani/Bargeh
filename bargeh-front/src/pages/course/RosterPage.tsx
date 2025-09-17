@@ -83,8 +83,8 @@ const RosterPage = () => {
               textAlign="center"
               color={subtleText}
             >
-              <Text fontSize="lg" mb={4}>هنوز هیچ دانشجویی ثبت‌نام نشده است</Text>
-              <Button colorScheme="teal">
+              <Text fontSize="lg" mb={4}>هنوز هیچ دانشجویی ثبت‌نام نشده است.</Text>
+              <Button paddingLeft={2} colorScheme="teal">
                 <Icon as={FiUserPlus} mr={2} />
                 افزودن دانشجو
               </Button>

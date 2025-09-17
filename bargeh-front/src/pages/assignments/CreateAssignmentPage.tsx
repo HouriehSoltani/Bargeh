@@ -20,6 +20,7 @@ import { useCourse } from "@/hooks/useCourse";
 import { convertEnglishTermToPersian } from "@/utils/persianDate";
 import { useState, useRef } from "react";
 import { api } from "@/services/api";
+import { assignmentService } from "@/services/assignmentService";
 
 interface AssignmentType {
   id: string;
@@ -36,6 +37,7 @@ interface FormData {
   uploadByStudent: 'student' | 'instructor';
   dueAt: string;
   totalPoints: number;
+  regradeEnabled: boolean;
 }
 
 const assignmentTypes: AssignmentType[] = [
@@ -85,7 +87,8 @@ const CreateAssignmentMerged = () => {
     anonymizedGrading: false,
     uploadByStudent: 'student',
     dueAt: '',
-    totalPoints: 100
+    totalPoints: 100,
+    regradeEnabled: true
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -129,7 +132,8 @@ const CreateAssignmentMerged = () => {
       errors.templatePdf = 'فایل تکلیف الزامی است';
     }
 
-    if (!formData.dueAt) {
+    // Only require deadline when student uploads
+    if (formData.uploadByStudent === 'student' && !formData.dueAt) {
       errors.dueAt = 'تاریخ تحویل الزامی است';
     }
 
@@ -144,20 +148,21 @@ const CreateAssignmentMerged = () => {
 
     setIsSubmitting(true);
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append('course', courseId!);
-      formDataToSend.append('title', formData.title);
-      formDataToSend.append('template_pdf', formData.templatePdf!);
-      formDataToSend.append('anonymized_grading', String(formData.anonymizedGrading));
-      formDataToSend.append('upload_by_student', String(formData.uploadByStudent === 'student'));
-      formDataToSend.append('due_at', new Date(formData.dueAt).toISOString());
-      formDataToSend.append('total_points', String(formData.totalPoints));
-      formDataToSend.append('is_published', 'false');
-      formDataToSend.append('type', 'homework');
+      // Prepare assignment data
+      const assignmentData = {
+        title: formData.title,
+        instructions: formData.title, // Using title as instructions for now
+        total_points: formData.totalPoints,
+        is_published: false,
+        regrade_enabled: formData.regradeEnabled,
+        due_at: formData.uploadByStudent === 'student' && formData.dueAt 
+          ? new Date(formData.dueAt).toISOString() 
+          : null,
+        course: parseInt(courseId!)
+      };
 
-      await api.post('/api/assignments/', formDataToSend, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      // Create assignment using the service
+      await assignmentService.createAssignment(parseInt(courseId!), assignmentData);
 
       navigate(`/courses/${courseId}/assignments`);
     } catch (error: any) {
@@ -425,6 +430,20 @@ const CreateAssignmentMerged = () => {
                     <Text fontSize="sm" color="gray.500">تکالیف تحویل داده شده به صورت ناشناس نمایش داده می‌شوند</Text>
                   </VStack>
 
+                  {/* Regrade Requests */}
+                  <VStack align="stretch" gap={1}>
+                    <HStack>
+                      <input
+                        type="checkbox"
+                        checked={formData.regradeEnabled}
+                        onChange={(e: any) => handleInputChange('regradeEnabled', e.target.checked)}
+                        style={{ transform: 'scale(1.2)' }}
+                      />
+                      <Text fontWeight="medium" color={textColor}>فعال‌سازی درخواست بازبینی</Text>
+                    </HStack>
+                    <Text fontSize="sm" color="gray.500">دانشجویان می‌توانند درخواست بازبینی نمره خود را ارسال کنند</Text>
+                  </VStack>
+
                   {/* Who will Upload Submissions */}
                   <VStack align="stretch" gap={3}>
                     <Text fontWeight="medium" color={textColor}>آپلود تکالیف توسط</Text>
@@ -454,15 +473,24 @@ const CreateAssignmentMerged = () => {
                     </Stack>
                   </VStack>
 
-                  {/* Due Date */}
-                  <VStack align="stretch" gap={2}>
-                    <PersianDatePicker
-                      label="تاریخ تحویل *"
-                      value={formData.dueAt}
-                      onChange={(value) => handleInputChange('dueAt', value)}
-                      errorMessage={validationErrors.dueAt}
-                    />
-                  </VStack>
+                  {/* Due Date - Only show when student uploads */}
+                  {formData.uploadByStudent === 'student' ? (
+                    <VStack align="stretch" gap={2}>
+                      <PersianDatePicker
+                        label="تاریخ تحویل *"
+                        value={formData.dueAt}
+                        onChange={(value) => handleInputChange('dueAt', value)}
+                        errorMessage={validationErrors.dueAt}
+                      />
+                    </VStack>
+                  ) : (
+                    <VStack align="stretch" gap={2}>
+                      <Text fontWeight="medium" color={textColor}>تاریخ تحویل</Text>
+                      <Text fontSize="sm" color="gray.500" bg="gray.50" p={3} borderRadius="md">
+                        در صورت آپلود توسط استاد، نیازی به تعیین تاریخ تحویل نیست
+                      </Text>
+                    </VStack>
+                  )}
 
                   {/* Points */}
                   <VStack align="stretch" gap={2}>

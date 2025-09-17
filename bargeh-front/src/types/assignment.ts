@@ -5,6 +5,7 @@ export interface Assignment {
   due_at: string | null;
   total_points: number;
   is_published: boolean;
+  regrade_enabled: boolean;
   created_at: string;
   course: number;
 }
