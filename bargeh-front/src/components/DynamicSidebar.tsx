@@ -39,7 +39,7 @@ const DynamicSidebar = ({
   const userMenuActive = useColorModeValue("gray.100", "gray.500");
   
   // Get course data to extract user's role in the course
-  const { course } = useCourse(courseId);
+  const { course: _course } = useCourse(courseId);
   const userMenuBorderHover = useColorModeValue("blue.300", "blue.500");
   const userMenuIcon = useColorModeValue("gray.400", "gray.300");
   const userMenuText = useColorModeValue("gray.800", "gray.100");

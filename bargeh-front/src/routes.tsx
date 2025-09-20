@@ -7,6 +7,7 @@ import RosterPage from "./pages/course/RosterPage";
 import ExtensionsPage from "./pages/course/ExtensionsPage";
 import SettingsPage from "./pages/course/SettingsPage";
 import CreateAssignmentMerged from "./pages/assignments/CreateAssignmentPage";
+import AssignmentOutlinePage from "./pages/assignments/AssignmentOutlinePage";
 import ProfilePage from "./pages/ProfilePage";
 import { RequireAuth } from "./components/RequireAuth";
 import RoleBasedRouter from "./components/RoleBasedRouter";
@@ -35,10 +36,14 @@ const router = createBrowserRouter([
       { path: "courses", element: <RoleBasedRouter /> },
       { path: "courses/:courseId", element: <CourseRoleBasedRouter /> },
       { path: "courses/:courseId/assignments", element: <AssignmentsRoleBasedRouter /> },
-      { 
-        path: "courses/:courseId/assignments/new", 
-        element: <CreateAssignmentMerged />
-      },
+             {
+               path: "courses/:courseId/assignments/new",
+               element: <CreateAssignmentMerged />
+             },
+             {
+               path: "courses/:courseId/assignments/:assignmentId/outline",
+               element: <AssignmentOutlinePage />
+             },
       { 
         path: "courses/:courseId/roster", 
         element: <RosterPage />

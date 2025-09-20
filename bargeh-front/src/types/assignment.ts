@@ -8,6 +8,7 @@ export interface Assignment {
   regrade_enabled: boolean;
   created_at: string;
   course: number;
+  template_pdf?: string; // URL to the PDF file
 }
 
 export interface AssignmentResponse {

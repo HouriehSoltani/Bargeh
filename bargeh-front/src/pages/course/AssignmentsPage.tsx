@@ -65,6 +65,13 @@ const AssignmentsPage = () => {
   const tableHeaderBg = useColorModeValue("gray.50", "gray.800");
   const tableRowHover = useColorModeValue("gray.50", "gray.800");
   const progressBg = useColorModeValue("gray.200", "gray.600");
+  
+  // Additional color mode values for menu and modals
+  const menuBg = useColorModeValue("white", "gray.700");
+  const menuBorderColor = useColorModeValue("gray.200", "gray.600");
+  const menuItemHoverBlue = useColorModeValue("blue.50", "blue.900");
+  const menuItemHoverRed = useColorModeValue("red.50", "red.900");
+  const modalBg = useColorModeValue("white", "gray.800");
 
   // Show loading state
   if (isLoading) {
@@ -278,9 +285,9 @@ const AssignmentsPage = () => {
                                 </IconButton>
                               </Menu.Trigger>
                               <Menu.Content 
-                                bg={useColorModeValue("white", "gray.700")}
+                                bg={menuBg}
                                 border="1px solid"
-                                borderColor={useColorModeValue("gray.200", "gray.600")}
+                                borderColor={menuBorderColor}
                                 borderRadius="md"
                                 boxShadow="lg"
                                 minW="180px"
@@ -295,8 +302,8 @@ const AssignmentsPage = () => {
                                   onClick={() => handleAssignmentSettings(assignment.id)}
                                   bg="transparent"
                                   cursor="pointer"
-                                  _hover={{ bg: useColorModeValue("blue.50", "blue.900") }}
-                                  _focus={{ bg: useColorModeValue("blue.50", "blue.900") }}
+                                  _hover={{ bg: menuItemHoverBlue }}
+                                  _focus={{ bg: menuItemHoverBlue }}
                                   py={2}
                                   px={3}
                                   fontSize="sm"
@@ -311,8 +318,8 @@ const AssignmentsPage = () => {
                                   onClick={() => handleDeleteAssignment(assignment.id)}
                                   bg="transparent"
                                   cursor="pointer"
-                                  _hover={{ bg: useColorModeValue("red.50", "red.900") }}
-                                  _focus={{ bg: useColorModeValue("red.50", "red.900") }}
+                                  _hover={{ bg: menuItemHoverRed }}
+                                  _focus={{ bg: menuItemHoverRed }}
                                   py={2}
                                   px={3}
                                   fontSize="sm"
@@ -380,7 +387,7 @@ const AssignmentsPage = () => {
           justifyContent="center"
         >
           <Box
-            bg={useColorModeValue("white", "gray.800")}
+            bg={modalBg}
             borderRadius="lg"
             p={6}
             maxW="400px"

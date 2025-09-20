@@ -6,7 +6,11 @@ import {
   FiFileText, 
   FiUsers, 
   FiClock,
-  FiKey
+  FiKey,
+  FiEdit3,
+  FiCheckSquare,
+  FiUpload,
+  FiBarChart
 } from "react-icons/fi";
 
 export interface NavigationItem {
@@ -22,7 +26,7 @@ export interface NavigationSection {
 }
 
 export interface SidebarConfig {
-  type: 'home' | 'course';
+  type: 'home' | 'course' | 'assignment';
   title?: string;
   subtitle?: string;
   sections: NavigationSection[];
@@ -80,8 +84,36 @@ export const courseNavigationConfig: SidebarConfig = {
   ]
 };
 
+// Assignment outline navigation config
+export const getAssignmentOutlineNavigationConfig = (courseId: string, assignmentId: string): SidebarConfig => {
+  return {
+    type: 'assignment',
+    sections: [
+      {
+        items: [
+          { icon: FiEdit3, label: "ویرایش طرح کلی", href: `/courses/${courseId}/assignments/${assignmentId}/outline`, path: `/courses/${courseId}/assignments/${assignmentId}/outline` },
+          { icon: FiCheckSquare, label: "ایجاد روبریک", href: `/courses/${courseId}/assignments/${assignmentId}/rubric`, path: `/courses/${courseId}/assignments/${assignmentId}/rubric` },
+          { icon: FiUpload, label: "مدیریت اسکن‌ها", href: `/courses/${courseId}/assignments/${assignmentId}/scans`, path: `/courses/${courseId}/assignments/${assignmentId}/scans` },
+          { icon: FiFileText, label: "مدیریت ارسال‌ها", href: `/courses/${courseId}/assignments/${assignmentId}/submissions`, path: `/courses/${courseId}/assignments/${assignmentId}/submissions` },
+          { icon: FiBarChart, label: "بررسی نمرات", href: `/courses/${courseId}/assignments/${assignmentId}/grades`, path: `/courses/${courseId}/assignments/${assignmentId}/grades` },
+        ]
+      }
+    ],
+    courseActions: [
+      { icon: FiLogOut, label: "بازگشت به تکالیف", href: `/courses/${courseId}/assignments` }
+    ]
+  };
+};
+
 // Function to get navigation config based on user role (simplified)
 export const getNavigationConfig = (pathname: string, courseId?: string, userRole?: 'instructor' | 'student'): SidebarConfig => {
+  // Check if this is an assignment outline page
+  const assignmentOutlineMatch = pathname.match(/^\/courses\/(\d+)\/assignments\/(\d+)\/outline/);
+  if (assignmentOutlineMatch) {
+    const [, courseId, assignmentId] = assignmentOutlineMatch;
+    return getAssignmentOutlineNavigationConfig(courseId, assignmentId);
+  }
+
   if (pathname.startsWith('/courses')) {
     // If we have a courseId, create dynamic course navigation
     if (courseId) {

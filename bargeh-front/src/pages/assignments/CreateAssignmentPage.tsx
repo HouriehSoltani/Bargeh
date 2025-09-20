@@ -151,19 +151,23 @@ const CreateAssignmentMerged = () => {
       const assignmentData = {
         title: formData.title,
         instructions: formData.title, // Using title as instructions for now
-        total_points: formData.totalPoints,
-        is_published: false,
-        regrade_enabled: formData.regradeEnabled,
-        due_at: formData.uploadByStudent === 'student' && formData.dueAt 
+        totalPoints: formData.totalPoints,
+        isPublished: false,
+        regradeEnabled: formData.regradeEnabled,
+        anonymizedGrading: formData.anonymizedGrading,
+        uploadByStudent: formData.uploadByStudent,
+        dueAt: formData.uploadByStudent === 'student' && formData.dueAt 
           ? new Date(formData.dueAt).toISOString() 
           : null,
-        course: parseInt(courseId!)
+        course: parseInt(courseId!),
+        templatePdf: formData.templatePdf || undefined // Include the uploaded PDF file
       };
 
       // Create assignment using the service
-      await assignmentService.createAssignment(parseInt(courseId!), assignmentData);
+      const createdAssignment = await assignmentService.createAssignment(parseInt(courseId!), assignmentData);
 
-      navigate(`/courses/${courseId}/assignments`);
+      // Navigate to outline page for the created assignment
+      navigate(`/courses/${courseId}/assignments/${createdAssignment.id}/outline`);
     } catch (error: any) {
       console.error('Error creating assignment:', error);
       
