@@ -1,4 +1,4 @@
-import { Box, Heading, VStack, HStack, Button, Icon, useDisclosure, Spinner, Text } from "@chakra-ui/react";
+import { Box, Heading, VStack, HStack, Button, Icon, useDisclosure, Spinner, Text, createToaster } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
 import CourseGrid from "./CourseGrid";
 import { FiFileText, FiPlus } from "react-icons/fi";
@@ -7,26 +7,47 @@ import CreateCoursePopup from "./CreateCoursePopup";
 import { useCourses } from "@/hooks/useCourses";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { courseService } from "@/services/courseService";
 
 const CourseDashboard = () => {
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
+  const iconBg = useColorModeValue("blue.50", "blue.900");
+  const descriptionColor = useColorModeValue("gray.600", "gray.300");
+  const toast = createToaster({ placement: "top" });
   const enrollDialog = useDisclosure();
   const createDialog = useDisclosure();
   
   // API hooks
   const { courses, isLoading, error, createCourse, enrollCourse, clearError } = useCourses();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
+  
+  // Check if user is instructor (based on User model, not CourseMembership)
+  const isInstructor = user?.role === 'instructor';
 
   const handleEnrollSubmit = async (values: { entryCode: string }) => {
     try {
-      const enrolledCourse = await enrollCourse(values);
-      enrollDialog.onClose();
-      // Navigate to the enrolled course page
-      navigate(`/courses/${enrolledCourse.id}`);
+      const response = await courseService.enrollCourse({ invite_code: values.entryCode });
+      
+      if (response.already_enrolled) {
+        // Don't close dialog, let the popup handle the error
+        throw new Error(`شما قبلاً در درس "${response.course.title}" ثبت‌نام کرده‌اید`);
+      } else {
+        toast.create({
+          title: 'ثبت‌نام موفق',
+          description: `با موفقیت در درس "${response.course.title}" ثبت‌نام شدید`,
+          type: 'success',
+          duration: 5000,
+        });
+        enrollDialog.onClose();
+        // Navigate to the enrolled course page
+        navigate(`/courses/${response.course.id}`);
+      }
     } catch (error) {
       console.error('Failed to enroll in course:', error);
+      // Re-throw the error so the popup can handle it
+      throw error;
     }
   };
 
@@ -116,7 +137,7 @@ const CourseDashboard = () => {
         >
           <VStack gap={6} maxW="500px">
             <Box
-              bg={useColorModeValue("blue.50", "blue.900")}
+              bg={iconBg}
               borderRadius="full"
               p={8}
               boxShadow="lg"
@@ -135,27 +156,32 @@ const CourseDashboard = () => {
               </Heading>
               
               <Text 
-                color={useColorModeValue("gray.600", "gray.300")}
+                color={descriptionColor}
                 fontSize={{ base: "sm", md: "md" }}
                 lineHeight="1.6"
                 maxW="400px"
               >
-                برای شروع کار، ابتدا یک درس جدید ایجاد کنید یا در یکی از درس‌های موجود ثبت‌نام کنید.
+                {isInstructor 
+                  ? "برای شروع کار، ابتدا یک درس جدید ایجاد کنید یا در یکی از درس‌های موجود ثبت‌نام کنید."
+                  : "برای شروع کار، در یکی از درس‌های موجود ثبت‌نام کنید."
+                }
               </Text>
             </VStack>
             
             <HStack gap={4} pt={4}>
-              <Button
-                bg="#2E5BBA"
-                color="white"
-                size="md"
-                paddingLeft={4}
-                _hover={{ bg: "#1E4A9A" }}
-                onClick={createDialog.onOpen}
-              >
-                <Icon as={FiPlus} mr={2} />
-                ایجاد درس جدید
-              </Button>
+              {isInstructor && (
+                <Button
+                  bg="#2E5BBA"
+                  color="white"
+                  size="md"
+                  paddingLeft={4}
+                  _hover={{ bg: "#1E4A9A" }}
+                  onClick={createDialog.onOpen}
+                >
+                  <Icon as={FiPlus} mr={2} />
+                  ایجاد درس جدید
+                </Button>
+              )}
               
               <Button
                 bg={bgColor}
@@ -175,7 +201,10 @@ const CourseDashboard = () => {
           </VStack>
         </Box>
       ) : (
-        <CourseGrid courses={courses} onCreateCourse={createDialog.onOpen} />
+        <CourseGrid 
+          courses={courses} 
+          onCreateCourse={isInstructor ? createDialog.onOpen : undefined} 
+        />
       )}
       
       {/* Bottom Action Bar */}
@@ -207,18 +236,20 @@ const CourseDashboard = () => {
             <Icon as={FiFileText} mr={2} />
             ثبت‌نام در درس
           </Button>
-          <Button
-            bg="#2E5BBA"
-            color="white"
-            size={{ base: "sm", md: "md" }}
-            paddingLeft={2}
-            _hover={{ bg: "#1E4A9A" }}
-            fontSize={{ base: "xs", md: "sm" }}
-            onClick={createDialog.onOpen}
-          >
-            <Icon as={FiPlus} mr={2} />
-            ایجاد درس
-          </Button>
+          {isInstructor && (
+            <Button
+              bg="#2E5BBA"
+              color="white"
+              size={{ base: "sm", md: "md" }}
+              paddingLeft={2}
+              _hover={{ bg: "#1E4A9A" }}
+              fontSize={{ base: "xs", md: "sm" }}
+              onClick={createDialog.onOpen}
+            >
+              <Icon as={FiPlus} mr={2} />
+              ایجاد درس
+            </Button>
+          )}
         </HStack>
       </Box>
 

@@ -7,12 +7,10 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface RegisterRequest {
+export interface StudentSignupRequest {
   email: string;
   name: string;
   password: string;
-  first_name?: string;
-  last_name?: string;
 }
 
 export interface AuthResponse {
@@ -25,6 +23,7 @@ export interface UserProfile {
   id: number;
   email: string;
   name: string;
+  role: 'instructor' | 'student';
   first_name?: string;
   last_name?: string;
   bio?: string;
@@ -45,9 +44,9 @@ export const authService = {
     return response;
   },
 
-  // Register new user
-  register: async (userData: RegisterRequest): Promise<{ id: number; email: string; name: string }> => {
-    const response = await api.post<{ id: number; email: string; name: string }>(API_CONFIG.ENDPOINTS.REGISTER, userData);
+  // Student signup (only students can sign up)
+  studentSignup: async (userData: StudentSignupRequest): Promise<{ id: number; email: string; name: string; role: string }> => {
+    const response = await api.post<{ id: number; email: string; name: string; role: string }>('/api/users/auth/signup/student/', userData);
     return response;
   },
 
@@ -77,8 +76,8 @@ export const authService = {
   },
 
   // Get current user info
-  getMe: async (): Promise<{ id: number; email: string; name: string }> => {
-    return api.get<{ id: number; email: string; name: string }>(API_CONFIG.ENDPOINTS.ME);
+  getMe: async (): Promise<{ id: number; email: string; name: string; role: string }> => {
+    return api.get<{ id: number; email: string; name: string; role: string }>(API_CONFIG.ENDPOINTS.ME);
   },
 
   // Update user profile

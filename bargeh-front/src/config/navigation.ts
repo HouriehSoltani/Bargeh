@@ -5,7 +5,8 @@ import {
   FiGrid, 
   FiFileText, 
   FiUsers, 
-  FiClock
+  FiClock,
+  FiKey
 } from "react-icons/fi";
 
 export interface NavigationItem {
@@ -28,17 +29,36 @@ export interface SidebarConfig {
   courseActions?: NavigationItem[];
 }
 
-// Home page navigation configuration
-export const homeNavigationConfig: SidebarConfig = {
-  type: 'home',
-  sections: [
-    {
-      items: [
-        { icon: FiBook, label: "داشبورد درس‌ها", href: '/', path: '/' },
-        { icon: FiSettings, label: "تنظیمات پروفایل", href: '/profile', path: '/profile' },
+// Function to get navigation config based on user role
+export const getHomeNavigationConfig = (userRole?: 'instructor' | 'student'): SidebarConfig => {
+  if (userRole === 'student') {
+    return {
+      type: 'home',
+      sections: [
+        {
+          items: [
+            { icon: FiBook, label: "درس‌های من", href: '/', path: '/' },
+            { icon: FiKey, label: "ثبت‌نام در درس", href: '/enroll', path: '/enroll' },
+            { icon: FiSettings, label: "تنظیمات پروفایل", href: '/profile', path: '/profile' },
+          ]
+        }
       ]
-    }
-  ]
+    };
+  }
+
+  // Default for instructors (base system)
+  return {
+    type: 'home',
+    sections: [
+      {
+        items: [
+          { icon: FiBook, label: "داشبورد درس‌ها", href: '/', path: '/' },
+          { icon: FiKey, label: "ثبت‌نام در درس", href: '/enroll', path: '/enroll' },
+          { icon: FiSettings, label: "تنظیمات پروفایل", href: '/profile', path: '/profile' },
+        ]
+      }
+    ]
+  };
 };
 
 // Course page navigation configuration
@@ -60,11 +80,30 @@ export const courseNavigationConfig: SidebarConfig = {
   ]
 };
 
-// Function to get navigation config based on current path
-export const getNavigationConfig = (pathname: string, courseId?: string): SidebarConfig => {
+// Function to get navigation config based on user role (simplified)
+export const getNavigationConfig = (pathname: string, courseId?: string, userRole?: 'instructor' | 'student'): SidebarConfig => {
   if (pathname.startsWith('/courses')) {
     // If we have a courseId, create dynamic course navigation
     if (courseId) {
+      // Students see limited navigation
+      if (userRole === 'student') {
+        return {
+          type: 'course',
+          sections: [
+            {
+              items: [
+                { icon: FiGrid, label: "داشبورد", href: `/courses/${courseId}`, path: `/courses/${courseId}` },
+                { icon: FiFileText, label: "تکالیف", href: `/courses/${courseId}/assignments`, path: `/courses/${courseId}/assignments` },
+              ]
+            }
+          ],
+          courseActions: [
+            { icon: FiLogOut, label: "انصراف از درس", href: `/courses/${courseId}/unenroll` }
+          ]
+        };
+      }
+
+      // Instructors see full navigation (everything)
       return {
         type: 'course',
         sections: [
@@ -85,5 +124,5 @@ export const getNavigationConfig = (pathname: string, courseId?: string): Sideba
     }
     return courseNavigationConfig;
   }
-  return homeNavigationConfig;
+  return getHomeNavigationConfig(userRole);
 };

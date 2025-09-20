@@ -19,7 +19,6 @@ import PersianDatePicker from "@/components/PersianDatePicker";
 import { useCourse } from "@/hooks/useCourse";
 import { convertEnglishTermToPersian } from "@/utils/persianDate";
 import { useState, useRef } from "react";
-import { api } from "@/services/api";
 import { assignmentService } from "@/services/assignmentService";
 
 interface AssignmentType {
@@ -226,6 +225,7 @@ const CreateAssignmentMerged = () => {
         <DynamicSidebar 
           courseTitle={course.title}
           courseSubtitle={`${convertEnglishTermToPersian(course.term)} ${course.year}`}
+          courseCode={course.courseCode}
           instructor={course.instructor}
           courseId={courseId}
         />

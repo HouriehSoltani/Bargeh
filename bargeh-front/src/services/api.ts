@@ -8,10 +8,13 @@ const apiClient: AxiosInstance = axios.create({
   headers: API_CONFIG.DEFAULT_HEADERS,
 });
 
-// Request interceptor - AUTHENTICATION DISABLED
+// Request interceptor - Add authentication headers
 apiClient.interceptors.request.use(
   (config) => {
-    // No authentication headers added
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
@@ -19,13 +22,42 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor - AUTHENTICATION DISABLED
+// Response interceptor - Handle token refresh
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
     return response;
   },
-  (error) => {
-    // No token refresh handling - just return the error
+  async (error) => {
+    const originalRequest = error.config;
+    
+    // If 401 and not already retrying
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      
+      try {
+        const refreshToken = localStorage.getItem('refresh_token');
+        if (refreshToken) {
+          // Try to refresh the token
+          const response = await axios.post(`${API_CONFIG.BASE_URL}/api/users/auth/refresh/`, {
+            refresh: refreshToken
+          });
+          
+          const { access } = response.data;
+          localStorage.setItem('access_token', access);
+          
+          // Retry the original request with new token
+          originalRequest.headers.Authorization = `Bearer ${access}`;
+          return apiClient(originalRequest);
+        }
+      } catch (refreshError) {
+        // Refresh failed, redirect to login
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      }
+    }
+    
     return Promise.reject(error);
   }
 );

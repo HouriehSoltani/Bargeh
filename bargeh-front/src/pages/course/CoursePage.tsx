@@ -100,6 +100,7 @@ const CoursePage = () => {
         <DynamicSidebar 
           courseTitle={course.title}
           courseSubtitle={`${convertEnglishTermToPersian(course.term)} ${course.year}`}
+          courseCode={course.courseCode}
           instructor={course.instructor}
           courseId={courseId}
         />

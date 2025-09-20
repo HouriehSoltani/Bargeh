@@ -8,6 +8,8 @@ interface UseCoursesReturn {
   error: string | null;
   createCourse: (courseData: CreateCourseRequest) => Promise<Course>;
   enrollCourse: (enrollData: EnrollCourseRequest) => Promise<Course>;
+  unenrollFromCourse: (courseId: number) => Promise<void>;
+  getCourse: (courseId: number) => Promise<Course>;
   updateCourse: (courseId: number, updates: Partial<Course>) => Promise<Course>;
   deleteCourse: (courseId: number) => Promise<void>;
   refreshCourses: () => Promise<void>;
@@ -56,16 +58,40 @@ export const useCourses = (): UseCoursesReturn => {
   const enrollCourse = useCallback(async (enrollData: EnrollCourseRequest): Promise<Course> => {
     try {
       setError(null);
-      const enrolledCourse = await courseService.enrollCourse(enrollData);
+      const response = await courseService.enrollCourse(enrollData);
       // Refresh courses from backend to get proper display values
       await loadCourses();
-      return enrolledCourse;
+      return response.course;
     } catch (err: unknown) {
       const errorMessage = (err as { response?: { data?: { detail?: string } } }).response?.data?.detail || 'Failed to enroll in course';
       setError(errorMessage);
       throw err;
     }
   }, [loadCourses]);
+
+  const unenrollFromCourse = useCallback(async (courseId: number): Promise<void> => {
+    try {
+      setError(null);
+      await courseService.unenrollFromCourse(courseId);
+      // Refresh courses from backend to get proper display values
+      await loadCourses();
+    } catch (err: unknown) {
+      const errorMessage = (err as { response?: { data?: { detail?: string } } }).response?.data?.detail || 'Failed to unenroll from course';
+      setError(errorMessage);
+      throw err;
+    }
+  }, [loadCourses]);
+
+  const getCourse = useCallback(async (courseId: number): Promise<Course> => {
+    try {
+      setError(null);
+      return await courseService.getCourse(courseId);
+    } catch (err: unknown) {
+      const errorMessage = (err as { response?: { data?: { detail?: string } } }).response?.data?.detail || 'Failed to get course';
+      setError(errorMessage);
+      throw err;
+    }
+  }, []);
 
   const updateCourse = useCallback(async (courseId: number, updates: Partial<Course>): Promise<Course> => {
     try {
@@ -110,6 +136,8 @@ export const useCourses = (): UseCoursesReturn => {
     error,
     createCourse,
     enrollCourse,
+    unenrollFromCourse,
+    getCourse,
     updateCourse,
     deleteCourse,
     refreshCourses,

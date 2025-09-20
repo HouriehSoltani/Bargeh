@@ -4,7 +4,7 @@ import { getHomeNavigationConfig } from "@/config/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Grid, GridItem } from "@chakra-ui/react";
 
-const HomePage = () => {
+const StudentHomePage = () => {
   const { user } = useAuth();
   
   return (
@@ -30,4 +30,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default StudentHomePage;

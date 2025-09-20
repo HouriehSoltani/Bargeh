@@ -11,6 +11,7 @@ interface EnrollCoursePopupProps {
 const EnrollCoursePopup = ({ isOpen, onClose, onSubmit }: EnrollCoursePopupProps) => {
   const [entryCode, setEntryCode] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
@@ -35,10 +36,11 @@ const EnrollCoursePopup = ({ isOpen, onClose, onSubmit }: EnrollCoursePopupProps
     // Reset form
     setEntryCode("");
     setError(null);
+    setIsLoading(false);
     onClose();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!entryCode.trim()) {
       setError("وارد کردن کُد ورود الزامی است");
       return;
@@ -47,9 +49,20 @@ const EnrollCoursePopup = ({ isOpen, onClose, onSubmit }: EnrollCoursePopupProps
       setError("کُد باید حداقل ۶ کاراکتر باشد");
       return;
     }
+    
     setError(null);
-    onSubmit?.({ entryCode: entryCode.trim() });
-    handleClose();
+    setIsLoading(true);
+    
+    try {
+      await onSubmit?.({ entryCode: entryCode.trim() });
+      // Only close if no error was thrown
+      handleClose();
+    } catch (err: any) {
+      // Show error in form
+      setError(err.message || "خطا در ثبت‌نام. لطفاً کد دعوت را بررسی کنید.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -62,7 +75,7 @@ const EnrollCoursePopup = ({ isOpen, onClose, onSubmit }: EnrollCoursePopupProps
       right={0}
       bottom={0}
       bg={overlayBg}
-      zIndex={1000}
+      zIndex={100}
       display="flex"
       alignItems="center"
       justifyContent="center"
@@ -70,6 +83,7 @@ const EnrollCoursePopup = ({ isOpen, onClose, onSubmit }: EnrollCoursePopupProps
       onClick={handleClose}
     >
       <Box
+        overflow="hidden"
         bg={bgColor}
         borderRadius="lg"
         boxShadow="2xl"
@@ -90,10 +104,10 @@ const EnrollCoursePopup = ({ isOpen, onClose, onSubmit }: EnrollCoursePopupProps
               <Input
                 value={entryCode}
                 onChange={(e) => setEntryCode(e.target.value)}
-                placeholder="کُد شش‌رقمی درس را وارد کنید"
+                placeholder="کُد ورود درس را وارد کنید"
                 color={textColor}
                 textAlign="center"
-                fontSize="lg"
+                fontSize="md"
                 letterSpacing="0.1em"
               />
               {error && (
@@ -102,10 +116,10 @@ const EnrollCoursePopup = ({ isOpen, onClose, onSubmit }: EnrollCoursePopupProps
             </VStack>
             
             <HStack justify="flex-end" gap={3} pt={2}>
-              <Button paddingX={2} variant="outline" onClick={handleClose} color={textColor}>
+              <Button paddingX={2} variant="outline" onClick={handleClose} color={textColor} disabled={isLoading}>
                 انصراف
               </Button>
-              <Button paddingX={2} colorScheme="teal" onClick={handleSubmit}>
+              <Button paddingX={2} colorScheme="teal" onClick={handleSubmit} loading={isLoading} loadingText="در حال ثبت‌نام...">
                 افزودن درس
               </Button>
             </HStack>

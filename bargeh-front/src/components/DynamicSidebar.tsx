@@ -3,14 +3,17 @@ import { Menu } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useCourse } from "@/hooks/useCourse";
 import { getNavigationConfig, type SidebarConfig } from "@/config/navigation";
 import { FiUser, FiLogIn, FiLogOut, FiChevronDown, FiSettings } from "react-icons/fi";
 import { useEffect, useState } from "react";
+import UnenrollCoursePopup from "./UnenrollCoursePopup";
 
 interface DynamicSidebarProps {
   config?: SidebarConfig;
   courseTitle?: string;
   courseSubtitle?: string;
+  courseCode?: string;
   instructor?: string;
   courseId?: string;
 }
@@ -19,6 +22,7 @@ const DynamicSidebar = ({
   config, 
   courseTitle, 
   courseSubtitle: _courseSubtitle, 
+  courseCode,
   instructor,
   courseId
 }: DynamicSidebarProps) => {
@@ -27,10 +31,28 @@ const DynamicSidebar = ({
   const textColor = useColorModeValue("gray.600", "gray.300");
   const activeBgColor = useColorModeValue("blue.100", "blue.900");
   const activeTextColor = useColorModeValue("blue.700", "blue.200");
+  
+  // User menu colors
+  const userMenuBg = useColorModeValue("white", "gray.700");
+  const userMenuBorder = useColorModeValue("gray.200", "gray.600");
+  const userMenuHover = useColorModeValue("gray.50", "gray.600");
+  const userMenuActive = useColorModeValue("gray.100", "gray.500");
+  
+  // Get course data to extract user's role in the course
+  const { course } = useCourse(courseId);
+  const userMenuBorderHover = useColorModeValue("blue.300", "blue.500");
+  const userMenuIcon = useColorModeValue("gray.400", "gray.300");
+  const userMenuText = useColorModeValue("gray.800", "gray.100");
+  const userMenuSubtext = useColorModeValue("gray.500", "gray.400");
+  const userMenuContentBg = useColorModeValue("white", "gray.700");
+  const userMenuContentBorder = useColorModeValue("gray.200", "gray.600");
+  const userMenuItemHover = useColorModeValue("blue.50", "blue.900");
+  const userMenuItemText = useColorModeValue("blue.700", "blue.200");
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
   const [sidebarHeight, setSidebarHeight] = useState("100vh");
+  const [isUnenrollPopupOpen, setIsUnenrollPopupOpen] = useState(false);
 
   useEffect(() => {
     const updateHeight = () => {
@@ -54,8 +76,8 @@ const DynamicSidebar = ({
     };
   }, []);
 
-  // Get navigation config based on current path if not provided
-  const navigationConfig = config || getNavigationConfig(location.pathname, courseId);
+  // Get navigation config based on current path and global user role (simplified)
+  const navigationConfig = config || getNavigationConfig(location.pathname, courseId, user?.role);
 
   const isActive = (path: string) => {
     // Handle exact matches
@@ -101,11 +123,12 @@ const DynamicSidebar = ({
   };
 
   const handleNavigation = (href: string) => {
-    if (href === '/courses/unenroll') {
-      // Handle unenroll action
-      return;
+    if (href.includes('/unenroll')) {
+      // Open unenroll popup instead of navigating
+      setIsUnenrollPopupOpen(true);
+    } else {
+      navigate(href);
     }
-    navigate(href);
   };
 
   return (
@@ -126,26 +149,26 @@ const DynamicSidebar = ({
             <Menu.Trigger asChild>
               <Box
                 p={4} 
-                bg={useColorModeValue("white", "gray.700")} 
+                bg={userMenuBg} 
                 borderRadius="lg" 
                 border="1px solid" 
-                borderColor={useColorModeValue("gray.200", "gray.600")}
+                borderColor={userMenuBorder}
                 cursor="pointer"
                 _hover={{ 
-                  bg: useColorModeValue("gray.50", "gray.600"),
+                  bg: userMenuHover,
                   transform: "translateX(-3px)",
                   boxShadow: "md",
-                  borderColor: useColorModeValue("blue.300", "blue.500")
+                  borderColor: userMenuBorderHover
                 }}
                 _active={{
-                  bg: useColorModeValue("gray.100", "gray.500")
+                  bg: userMenuActive
                 }}
                 transition="all 0.3s ease"
                 dir="rtl"
               >
                 <HStack gap={3} justify="space-between" dir="rtl">
                   <HStack gap={2}>
-                    <Icon as={FiChevronDown} color={useColorModeValue("gray.400", "gray.300")} />
+                    <Icon as={FiChevronDown} color={userMenuIcon} />
                     <Box 
                       w="36px" 
                       h="36px" 
@@ -163,10 +186,10 @@ const DynamicSidebar = ({
                     </Box>
                   </HStack>
                   <VStack align="start" gap={0} flex={1}>
-                    <Text fontSize="sm" fontWeight="semibold" color={useColorModeValue("gray.800", "gray.100")}>
+                    <Text fontSize="xs" fontWeight="bold" color={userMenuText}>
                       {user.name || user.email}
                     </Text>
-                    <Text fontSize="xs" color={useColorModeValue("gray.500", "gray.400")}>
+                    <Text fontSize="xs" color={userMenuSubtext}>
                       {user.email}
                     </Text>
                   </VStack>
@@ -175,9 +198,9 @@ const DynamicSidebar = ({
             </Menu.Trigger>
             <Menu.Content 
               dir="rtl"
-              bg={useColorModeValue("white", "gray.700")}
+              bg={userMenuContentBg}
               border="1px solid"
-              borderColor={useColorModeValue("gray.200", "gray.600")}
+              borderColor={userMenuContentBorder}
               borderRadius="lg"
               boxShadow="xl"
               minW="200px"
@@ -189,12 +212,12 @@ const DynamicSidebar = ({
                 bg="transparent"
                 cursor="pointer"
                 _hover={{ 
-                  bg: useColorModeValue("blue.50", "blue.900"),
-                  color: useColorModeValue("blue.700", "blue.200")
+                  bg: userMenuItemHover,
+                  color: userMenuItemText
                 }}
                 _focus={{ 
-                  bg: useColorModeValue("blue.50", "blue.900"),
-                  color: useColorModeValue("blue.700", "blue.200")
+                  bg: userMenuItemHover,
+                  color: userMenuItemText
                 }}
                 py={3}
                 px={4}
@@ -212,12 +235,12 @@ const DynamicSidebar = ({
                 bg="transparent"
                 cursor="pointer"
                 _hover={{ 
-                  bg: useColorModeValue("blue.50", "blue.900"),
-                  color: useColorModeValue("blue.700", "blue.200")
+                  bg: userMenuItemHover,
+                  color: userMenuItemText
                 }}
                 _focus={{ 
-                  bg: useColorModeValue("blue.50", "blue.900"),
-                  color: useColorModeValue("blue.700", "blue.200")
+                  bg: userMenuItemHover,
+                  color: userMenuItemText
                 }}
                 py={3}
                 px={4}
@@ -351,6 +374,18 @@ const DynamicSidebar = ({
           )
         )}
       </VStack>
+
+      {/* Unenroll Popup */}
+      {isUnenrollPopupOpen && courseId && courseTitle && instructor && (
+        <UnenrollCoursePopup
+          isOpen={isUnenrollPopupOpen}
+          onClose={() => setIsUnenrollPopupOpen(false)}
+          courseId={parseInt(courseId)}
+          courseTitle={courseTitle}
+          courseCode={courseCode || ''}
+          instructor={instructor}
+        />
+      )}
     </Box>
   );
 };

@@ -13,7 +13,7 @@ import {
 import { useState, useEffect } from "react";
 import { FiEye, FiEyeOff, FiMail } from "react-icons/fi";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -77,7 +77,7 @@ const LoginPage = () => {
               ورود به سیستم
             </Heading>
             <Text color="gray.600" textAlign="center" fontSize="sm">
-              برای دسترسی به داشبورد درس‌ها، لطفاً وارد شوید
+              برای دسترسی به برگه، لطفاً وارد شوید
             </Text>
           </VStack>
 
@@ -102,7 +102,7 @@ const LoginPage = () => {
                     placeholder="example@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    size="lg"
+                    size="md"
                     borderColor="gray.200"
                     _focus={{
                       borderColor: "#4A90E2",
@@ -134,7 +134,7 @@ const LoginPage = () => {
                     placeholder="رمز عبور خود را وارد کنید"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    size="lg"
+                    size="md"
                     borderColor="gray.200"
                     _focus={{
                       borderColor: "#4A90E2",
@@ -203,18 +203,20 @@ const LoginPage = () => {
             <Text color="gray.600" fontSize="sm" textAlign="center">
               حساب کاربری ندارید؟
             </Text>
-            <Button
-              variant="outline"
-              size="md"
-              w="full"
-              borderColor="#4A90E2"
-              color="#4A90E2"
-              _hover={{ bg: "#4A90E2", color: "white" }}
-              fontFamily="inherit"
-              onClick={() => navigate('/register')}
-            >
-              ثبت‌نام
-            </Button>
+            <RouterLink to="/signup">
+              <Button
+                p={4}
+                variant="outline"
+                size="md"
+                w="full"
+                borderColor="#4A90E2"
+                color="#4A90E2"
+                _hover={{ bg: "#4A90E2", color: "white" }}
+                fontFamily="inherit"
+              >
+                ثبت‌نام 
+              </Button>
+            </RouterLink>
           </VStack>
         </Box>
       </Container>

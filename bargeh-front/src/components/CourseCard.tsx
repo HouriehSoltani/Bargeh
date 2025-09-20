@@ -21,6 +21,7 @@ export interface Course {
   assignments: number;
   term: string;
   year: number;
+  user_role?: 'instructor' | 'ta' | 'student' | null; // User's role in this course
 }
 
 interface CourseCardProps {

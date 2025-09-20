@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { assignmentService } from '../services/assignmentService';
-import type { Assignment, AssignmentResponse } from '../types/assignment';
+import type { Assignment } from '../types/assignment';
 
 interface UseAssignmentsReturn {
   assignments: Assignment[];

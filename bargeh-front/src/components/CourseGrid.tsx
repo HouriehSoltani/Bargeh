@@ -45,8 +45,8 @@ const CourseGrid = ({ courses, onCreateCourse }: CourseGridProps) => {
                 <CourseCard course={course} />
               </GridItem>
             ))}
-            {/* Show create course card in the most recent term */}
-            {termYear === sortedTermYearGroups[0] && (
+            {/* Show create course card in the most recent term (instructors only) */}
+            {termYear === sortedTermYearGroups[0] && onCreateCourse && (
               <GridItem>
                 <CreateCourseCard onClick={onCreateCourse} />
               </GridItem>

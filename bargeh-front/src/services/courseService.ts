@@ -12,7 +12,13 @@ export interface CreateCourseRequest {
 }
 
 export interface EnrollCourseRequest {
-  entryCode: string;
+  invite_code: string;
+}
+
+export interface EnrollCourseResponse {
+  message: string;
+  course: CourseResponse;
+  already_enrolled: boolean;
 }
 
 export interface CourseResponse extends Course {
@@ -52,8 +58,8 @@ export const courseService = {
   },
 
   // Enroll in a course using entry code
-  enrollCourse: async (enrollData: EnrollCourseRequest): Promise<CourseResponse> => {
-    return api.post<CourseResponse>(API_CONFIG.ENDPOINTS.ENROLL_COURSE, enrollData);
+  enrollCourse: async (enrollData: EnrollCourseRequest): Promise<EnrollCourseResponse> => {
+    return api.post<EnrollCourseResponse>(API_CONFIG.ENDPOINTS.ENROLL_BY_CODE, enrollData);
   },
 
   // Update course settings
@@ -79,5 +85,10 @@ export const courseService = {
   // Delete a course (if user has permission)
   deleteCourse: async (courseId: number): Promise<void> => {
     return api.delete<void>(API_CONFIG.ENDPOINTS.COURSE_DETAIL(courseId));
+  },
+
+  // Unenroll from a course
+  unenrollFromCourse: async (courseId: number): Promise<{ message: string; course: CourseResponse }> => {
+    return api.delete<{ message: string; course: CourseResponse }>(`/api/courses/${courseId}/unenroll/`);
   },
 };

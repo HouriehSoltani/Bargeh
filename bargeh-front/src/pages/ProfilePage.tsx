@@ -1,12 +1,12 @@
 import DynamicSidebar from "@/components/DynamicSidebar";
-import { Box, Grid, GridItem, Heading, VStack, Button, Input, Textarea, HStack, Icon, Spinner, Text, createToaster } from "@chakra-ui/react";
+import { Box, Grid, GridItem, Heading, VStack, Button, Input, HStack, Icon, Spinner, Text, createToaster } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
 import { FiSave } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useState, useEffect } from "react";
 import { userService } from "@/services/userService";
-import { homeNavigationConfig } from "@/config/navigation";
+import { getHomeNavigationConfig } from "@/config/navigation";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -195,7 +195,7 @@ const ProfilePage = () => {
       gap={0}
     >
       <GridItem area="aside" display={{ base: "none", md: "block" }}>
-        <DynamicSidebar config={homeNavigationConfig} />
+        <DynamicSidebar config={getHomeNavigationConfig(user?.role)} />
       </GridItem>
 
       <GridItem area="main">
@@ -212,7 +212,7 @@ const ProfilePage = () => {
               bg={useColorModeValue("gray.50", "gray.800")}
               boxShadow="sm"
             >
-              <VStack align="stretch" gap={4}>
+              <VStack align="stretch" gap={8}>
                 <Box>
                   <Box as="label" fontWeight="medium" color={textColor} display="block" mb={2}>
                     نام کاربری <Text as="span" color="red.500">*</Text>
@@ -279,23 +279,6 @@ const ProfilePage = () => {
                     />
                   </Box>
                 </HStack>
-                
-                <Box>
-                  <Box as="label" fontWeight="medium" color={textColor} display="block" mb={2}>
-                    بیوگرافی
-                  </Box>
-                  <Textarea 
-                    padding={2}
-                    value={formData.bio}
-                    onChange={(e) => handleInputChange("bio", e.target.value)}
-                    placeholder="درباره خود بنویسید..."
-                    color={textColor}
-                    rows={4}
-                    _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px #3182ce" }}
-                    bg={useColorModeValue("white", "gray.700")}
-                    borderColor={useColorModeValue("gray.300", "gray.600")}
-                  />
-                </Box>
                 
                 <HStack justify="space-between" gap={3}>
                   <Button p={2} variant="outline" onClick={handleCancel}>

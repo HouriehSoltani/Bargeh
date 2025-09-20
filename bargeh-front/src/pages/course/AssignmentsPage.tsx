@@ -101,6 +101,7 @@ const AssignmentsPage = () => {
         <DynamicSidebar 
           courseTitle={course.title}
           courseSubtitle={`${convertEnglishTermToPersian(course.term)} ${course.year}`}
+          courseCode={course.courseCode}
           instructor={course.instructor}
           courseId={courseId}
         />
@@ -337,7 +338,7 @@ const AssignmentsPage = () => {
       
       {/* Bottom Action Bar */}
       <Box
-        position="fixed"
+        position='fixed'
         bottom={0}
         left={0}
         right={0}
