@@ -39,6 +39,23 @@ export interface PaginatedResponse<T> {
   results: T[];
 }
 
+// Roster/Membership types
+export interface CourseMembership {
+  id: number;
+  user: {
+    id: number;
+    email: string;
+    name: string;
+    first_name?: string;
+    last_name?: string;
+    date_joined: string;
+    last_login?: string;
+  };
+  course: number;
+  role: 'instructor' | 'ta' | 'student';
+  created_at: string;
+}
+
 // Course service methods
 export const courseService = {
   // Get all courses for the current user
@@ -78,8 +95,19 @@ export const courseService = {
   },
 
   // Get course roster
-  getRoster: async (courseId: number): Promise<unknown[]> => {
-    return api.get<unknown[]>(API_CONFIG.ENDPOINTS.ROSTER(courseId));
+  getRoster: async (courseId: number): Promise<CourseMembership[]> => {
+    const response = await api.get<PaginatedResponse<CourseMembership>>(API_CONFIG.ENDPOINTS.ROSTER(courseId));
+    return response.results;
+  },
+
+  // Remove student from course
+  removeStudent: async (courseId: number, membershipId: number): Promise<{ message: string; removed_user: any }> => {
+    return api.delete(`/api/courses/${courseId}/roster/${membershipId}/remove/`);
+  },
+
+  // Add user to course
+  addUser: async (courseId: number, email: string): Promise<{ message: string; added_user: any; membership: any }> => {
+    return api.post(`/api/courses/${courseId}/roster/add/`, { email });
   },
 
   // Delete a course (if user has permission)

@@ -69,7 +69,7 @@ export const courseNavigationConfig: SidebarConfig = {
       items: [
         { icon: FiGrid, label: "داشبورد", href: '/courses', path: '/courses' },
         { icon: FiFileText, label: "تکالیف", href: '/courses/assignments', path: '/courses/assignments' },
-        { icon: FiUsers, label: "لیست دانشجویان", href: '/courses/roster', path: '/courses/roster' },
+        { icon: FiUsers, label: "لیست افراد", href: '/courses/roster', path: '/courses/roster' },
         { icon: FiClock, label: "تمدیدها", href: '/courses/extensions', path: '/courses/extensions' },
         { icon: FiSettings, label: "تنظیمات درس", href: '/courses/settings', path: '/courses/settings' },
       ]
@@ -111,7 +111,7 @@ export const getNavigationConfig = (pathname: string, courseId?: string, userRol
             items: [
               { icon: FiGrid, label: "داشبورد", href: `/courses/${courseId}`, path: `/courses/${courseId}` },
               { icon: FiFileText, label: "تکالیف", href: `/courses/${courseId}/assignments`, path: `/courses/${courseId}/assignments` },
-              { icon: FiUsers, label: "لیست دانشجویان", href: `/courses/${courseId}/roster`, path: `/courses/${courseId}/roster` },
+              { icon: FiUsers, label: "لیست افراد", href: `/courses/${courseId}/roster`, path: `/courses/${courseId}/roster` },
               { icon: FiClock, label: "تمدیدها", href: `/courses/${courseId}/extensions`, path: `/courses/${courseId}/extensions` },
               { icon: FiSettings, label: "تنظیمات درس", href: `/courses/${courseId}/settings`, path: `/courses/${courseId}/settings` },
             ]
