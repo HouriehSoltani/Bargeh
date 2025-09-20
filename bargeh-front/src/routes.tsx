@@ -8,6 +8,7 @@ import ExtensionsPage from "./pages/course/ExtensionsPage";
 import SettingsPage from "./pages/course/SettingsPage";
 import CreateAssignmentMerged from "./pages/assignments/CreateAssignmentPage";
 import AssignmentOutlinePage from "./pages/assignments/AssignmentOutlinePage";
+import ManageSubmissionsPage from "./pages/assignments/ManageSubmissionsPage";
 import ProfilePage from "./pages/ProfilePage";
 import { RequireAuth } from "./components/RequireAuth";
 import RoleBasedRouter from "./components/RoleBasedRouter";
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
              {
                path: "courses/:courseId/assignments/:assignmentId/outline",
                element: <AssignmentOutlinePage />
+             },
+             {
+               path: "courses/:courseId/assignments/:assignmentId/submissions",
+               element: <ManageSubmissionsPage />
              },
       { 
         path: "courses/:courseId/roster", 

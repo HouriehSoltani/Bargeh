@@ -19,7 +19,7 @@ const CourseDashboard = () => {
   const createDialog = useDisclosure();
   
   // API hooks
-  const { courses, isLoading, error, createCourse, enrollCourse, clearError } = useCourses();
+  const { courses, isLoading, error, createCourse, clearError } = useCourses();
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   

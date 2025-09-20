@@ -99,7 +99,7 @@ const CoursePage = () => {
   return (
     <Grid
       templateAreas={{ base: `"main"`, md: `"aside main"` }}
-      templateColumns={{ base: "1fr", md: "250px 1fr" }}
+      templateColumns={{ base: "1fr", md: "300px 1fr" }}
       minH="100vh"
       gap={0}
     >
@@ -226,7 +226,19 @@ const CoursePage = () => {
                           _hover={{ bg: tableRowHover }}
                         >
                           <Box as="td" p={3} color={textColor} fontWeight="medium">
-                            {assignment.title}
+                            <Button
+                              variant="ghost"
+                              color={textColor}
+                              fontWeight="medium"
+                              p={0}
+                              h="auto"
+                              textAlign="left"
+                              textDecoration="underline"
+                              onClick={() => navigate(`/courses/${courseId}/assignments/${assignment.id}/submissions`)}
+                              _hover={{ color: "blue.500", textDecoration: "underline" }}
+                            >
+                              {assignment.title}
+                            </Button>
                           </Box>
                           <Box as="td" p={3} color={subtleText}>
                             {new Date(assignment.created_at).toLocaleDateString('fa-IR')}

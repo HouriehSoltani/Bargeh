@@ -218,7 +218,7 @@ const CreateAssignmentMerged = () => {
   return (
     <Grid
       templateAreas={{ base: `"main"`, md: `"aside main"` }}
-      templateColumns={{ base: "1fr", md: "250px 1fr" }}
+      templateColumns={{ base: "1fr", md: "300px 1fr" }}
       templateRows={{ base: "1fr", md: "1fr" }}
       minH="100vh"
       gap={0}

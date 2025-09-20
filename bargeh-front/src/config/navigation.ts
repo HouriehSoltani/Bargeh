@@ -6,11 +6,11 @@ import {
   FiFileText, 
   FiUsers, 
   FiClock,
-  FiKey,
   FiEdit3,
   FiCheckSquare,
   FiUpload,
-  FiBarChart
+  FiBarChart,
+  FiArrowRight
 } from "react-icons/fi";
 
 export interface NavigationItem {
@@ -42,7 +42,6 @@ export const getHomeNavigationConfig = (userRole?: 'instructor' | 'student'): Si
         {
           items: [
             { icon: FiBook, label: "درس‌های من", href: '/', path: '/' },
-            { icon: FiKey, label: "ثبت‌نام در درس", href: '/enroll', path: '/enroll' },
             { icon: FiSettings, label: "تنظیمات پروفایل", href: '/profile', path: '/profile' },
           ]
         }
@@ -57,7 +56,6 @@ export const getHomeNavigationConfig = (userRole?: 'instructor' | 'student'): Si
       {
         items: [
           { icon: FiBook, label: "داشبورد درس‌ها", href: '/', path: '/' },
-          { icon: FiKey, label: "ثبت‌نام در درس", href: '/enroll', path: '/enroll' },
           { icon: FiSettings, label: "تنظیمات پروفایل", href: '/profile', path: '/profile' },
         ]
       }
@@ -84,34 +82,44 @@ export const courseNavigationConfig: SidebarConfig = {
   ]
 };
 
-// Assignment outline navigation config
-export const getAssignmentOutlineNavigationConfig = (courseId: string, assignmentId: string): SidebarConfig => {
+// Assignment navigation config
+export const getAssignmentNavigationConfig = (courseId: string, assignmentId: string, courseTitle?: string, assignmentTitle?: string): SidebarConfig => {
   return {
     type: 'assignment',
+    title: assignmentTitle || 'Assignment',
+    subtitle: courseTitle || 'Course',
     sections: [
       {
         items: [
-          { icon: FiEdit3, label: "ویرایش طرح کلی", href: `/courses/${courseId}/assignments/${assignmentId}/outline`, path: `/courses/${courseId}/assignments/${assignmentId}/outline` },
-          { icon: FiCheckSquare, label: "ایجاد روبریک", href: `/courses/${courseId}/assignments/${assignmentId}/rubric`, path: `/courses/${courseId}/assignments/${assignmentId}/rubric` },
-          { icon: FiUpload, label: "مدیریت اسکن‌ها", href: `/courses/${courseId}/assignments/${assignmentId}/scans`, path: `/courses/${courseId}/assignments/${assignmentId}/scans` },
-          { icon: FiFileText, label: "مدیریت ارسال‌ها", href: `/courses/${courseId}/assignments/${assignmentId}/submissions`, path: `/courses/${courseId}/assignments/${assignmentId}/submissions` },
+          { icon: FiArrowRight, label: `بازگشت به ${courseTitle || 'درس'}`, href: `/courses/${courseId}`, path: `/courses/${courseId}` },
+        ]
+      },
+      {
+        items: [
+          { icon: FiEdit3, label: "طرح کلی", href: `/courses/${courseId}/assignments/${assignmentId}/outline`, path: `/courses/${courseId}/assignments/${assignmentId}/outline` },
+          { icon: FiUpload, label: "مدیریت ارسال‌ها", href: `/courses/${courseId}/assignments/${assignmentId}/submissions`, path: `/courses/${courseId}/assignments/${assignmentId}/submissions` },
+          { icon: FiCheckSquare, label: "نمره‌دهی", href: `/courses/${courseId}/assignments/${assignmentId}/grade`, path: `/courses/${courseId}/assignments/${assignmentId}/grade` },
           { icon: FiBarChart, label: "بررسی نمرات", href: `/courses/${courseId}/assignments/${assignmentId}/grades`, path: `/courses/${courseId}/assignments/${assignmentId}/grades` },
         ]
+      },
+      {
+        items: [
+          { icon: FiClock, label: "درخواست‌های بازبینی", href: `/courses/${courseId}/assignments/${assignmentId}/regrade`, path: `/courses/${courseId}/assignments/${assignmentId}/regrade` },
+          { icon: FiBarChart, label: "آمار", href: `/courses/${courseId}/assignments/${assignmentId}/statistics`, path: `/courses/${courseId}/assignments/${assignmentId}/statistics` },
+          { icon: FiSettings, label: "تنظیمات", href: `/courses/${courseId}/assignments/${assignmentId}/settings`, path: `/courses/${courseId}/assignments/${assignmentId}/settings` },
+        ]
       }
-    ],
-    courseActions: [
-      { icon: FiLogOut, label: "بازگشت به تکالیف", href: `/courses/${courseId}/assignments` }
     ]
   };
 };
 
 // Function to get navigation config based on user role (simplified)
-export const getNavigationConfig = (pathname: string, courseId?: string, userRole?: 'instructor' | 'student'): SidebarConfig => {
-  // Check if this is an assignment outline page
-  const assignmentOutlineMatch = pathname.match(/^\/courses\/(\d+)\/assignments\/(\d+)\/outline/);
-  if (assignmentOutlineMatch) {
-    const [, courseId, assignmentId] = assignmentOutlineMatch;
-    return getAssignmentOutlineNavigationConfig(courseId, assignmentId);
+export const getNavigationConfig = (pathname: string, courseId?: string, userRole?: 'instructor' | 'student', courseTitle?: string, assignmentTitle?: string): SidebarConfig => {
+  // Check if this is an assignment page (outline or submissions)
+  const assignmentMatch = pathname.match(/^\/courses\/(\d+)\/assignments\/(\d+)\/(outline|submissions)/);
+  if (assignmentMatch) {
+    const [, courseId, assignmentId] = assignmentMatch;
+    return getAssignmentNavigationConfig(courseId, assignmentId, courseTitle, assignmentTitle);
   }
 
   if (pathname.startsWith('/courses')) {

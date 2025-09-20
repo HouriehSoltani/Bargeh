@@ -50,7 +50,7 @@ const StudentAssignmentsPage = () => {
       templateAreas={{ base: `"main"`, md: `"aside main"` }}
       templateColumns={{
         base: "1fr",
-        md: "250px 1fr",
+        md: "300px 1fr",
       }}
       minH="100vh"
       gap={0}

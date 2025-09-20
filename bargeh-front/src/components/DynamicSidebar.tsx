@@ -4,6 +4,7 @@ import { useColorModeValue } from "@/hooks/useColorMode";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useCourse } from "@/hooks/useCourse";
+import { useAssignment } from "@/hooks/useAssignment";
 import { getNavigationConfig, type SidebarConfig } from "@/config/navigation";
 import { FiUser, FiLogIn, FiLogOut, FiChevronDown, FiSettings } from "react-icons/fi";
 import { useEffect, useState } from "react";
@@ -39,7 +40,7 @@ const DynamicSidebar = ({
   const userMenuActive = useColorModeValue("gray.100", "gray.500");
   
   // Get course data to extract user's role in the course
-  const { course: _course } = useCourse(courseId);
+  const { course } = useCourse(courseId);
   const userMenuBorderHover = useColorModeValue("blue.300", "blue.500");
   const userMenuIcon = useColorModeValue("gray.400", "gray.300");
   const userMenuText = useColorModeValue("gray.800", "gray.100");
@@ -50,6 +51,11 @@ const DynamicSidebar = ({
   const userMenuItemText = useColorModeValue("blue.700", "blue.200");
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Get assignment data if we're on an assignment page
+  const assignmentMatch = location.pathname.match(/^\/courses\/(\d+)\/assignments\/(\d+)\/(outline|submissions)/);
+  const assignmentId = assignmentMatch ? assignmentMatch[2] : undefined;
+  const { assignment } = useAssignment(assignmentId);
   const { user, isAuthenticated, logout } = useAuth();
   const [sidebarHeight, setSidebarHeight] = useState("100vh");
   const [isUnenrollPopupOpen, setIsUnenrollPopupOpen] = useState(false);
@@ -77,7 +83,7 @@ const DynamicSidebar = ({
   }, []);
 
   // Get navigation config based on current path and global user role (simplified)
-  const navigationConfig = config || getNavigationConfig(location.pathname, courseId, user?.role);
+  const navigationConfig = config || getNavigationConfig(location.pathname, courseId, user?.role, course?.title, assignment?.title);
 
   const isActive = (path: string) => {
     // Handle exact matches
@@ -263,6 +269,13 @@ const DynamicSidebar = ({
             </Heading>
         )}
 
+        {/* Assignment Info (if on assignment page) */}
+        {navigationConfig.type === 'assignment' && (
+            <Heading size="lg" color={textColor} fontWeight="bold">
+              {navigationConfig.title}
+            </Heading>
+        )}
+
         {/* Navigation Sections */}
         {navigationConfig.sections.map((section, sectionIndex) => (
           <VStack key={sectionIndex} gap={2} align="stretch">
@@ -290,6 +303,14 @@ const DynamicSidebar = ({
                 {item.label}
               </Button>
             ))}
+            {/* Add separator after first section (Back to Course) */}
+            {sectionIndex === 0 && (
+              <Box h="1px" bg={borderColor} mx={2} my={2} />
+            )}
+            {/* Add separator after second section (Review Grades) for assignment pages */}
+            {navigationConfig.type === 'assignment' && sectionIndex === 1 && (
+              <Box h="1px" bg={borderColor} mx={2} my={2} />
+            )}
           </VStack>
         ))}
 

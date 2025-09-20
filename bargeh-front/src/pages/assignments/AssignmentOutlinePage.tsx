@@ -11,18 +11,13 @@ import { useColorModeValue } from '@/hooks/useColorMode';
 import { useAssignment } from '@/hooks/useAssignment';
 import DynamicSidebar from '@/components/DynamicSidebar';
 import GradescopePDFViewer from '@/components/GradescopePDFViewer';
+import { questionService } from '@/services/questionService';
 
 interface Question {
   id: string;
   title: string;
   points: number;
-  position?: {
-    pageNumber: number;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
+  pageNumber?: number;
 }
 
 const AssignmentOutlinePage = () => {
@@ -41,22 +36,48 @@ const AssignmentOutlinePage = () => {
   }, [assignment]);
   
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
 
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
 
-  const saveOutline = () => {
-    // TODO: Implement API call to save outline
-    console.log('Saving outline:', questions);
-    navigate(`/courses/${courseId}/assignments/${assignmentId}`);
+  const saveOutline = async () => {
+    if (!assignmentId || questions.length === 0) {
+      alert("لطفاً حداقل یک سوال اضافه کنید");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      // Convert questions to the format expected by the backend
+      const questionsData = questions.map((question, index) => ({
+        title: question.title,
+        points: question.points,
+        order: index + 1,
+        default_page_numbers: question.pageNumber ? [question.pageNumber] : []
+      }));
+
+      // Save questions to backend
+      await questionService.updateQuestions(parseInt(assignmentId), questionsData);
+
+      alert("طرح کلی با موفقیت ذخیره شد");
+
+      // Navigate to submissions tab in the unified assignment page
+      navigate(`/courses/${courseId}/assignments/${assignmentId}/submissions`);
+    } catch (error) {
+      console.error('Error saving outline:', error);
+      alert("خطا در ذخیره طرح کلی");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Show loading state
   if (assignmentLoading) {
     return (
       <Grid
-        templateAreas={{ base: `"main"`, lg: `"sidebar main"` }}
-        templateColumns={{ base: "1fr", lg: "300px 1fr" }}
+        templateAreas={{ base: `"main"`, md: `"sidebar main"` }}
+        templateColumns={{ base: "1fr", md: "300px 1fr" }}
         minH="100vh"
         gap={0}
       >
@@ -74,8 +95,8 @@ const AssignmentOutlinePage = () => {
   if (assignmentError) {
     return (
       <Grid
-        templateAreas={{ base: `"main"`, lg: `"sidebar main"` }}
-        templateColumns={{ base: "1fr", lg: "300px 1fr" }}
+        templateAreas={{ base: `"main"`, md: `"sidebar main"` }}
+        templateColumns={{ base: "1fr", md: "300px 1fr" }}
         minH="100vh"
         gap={0}
       >
@@ -91,7 +112,7 @@ const AssignmentOutlinePage = () => {
 
   return (
     <Grid
-      templateAreas={{ base: `"main"`, lg: `"sidebar pdf"` }}
+      templateAreas={{ base: `"main"`, lg: `"sidebar main"` }}
       templateColumns={{ base: "1fr", lg: "300px 1fr" }}
       minH="100vh"
       gap={0}
@@ -102,7 +123,7 @@ const AssignmentOutlinePage = () => {
       </GridItem>
 
       {/* Main Content - PDF Annotation Viewer */}
-      <GridItem area="pdf" colSpan={2} bg={bgColor}>
+      <GridItem area="main" bg={bgColor}>
         <VStack align="stretch" h="100vh" p={4}>
           {/* Header */}
           <Text fontSize="lg" fontWeight="semibold" color={textColor} mb={4}>
@@ -121,6 +142,7 @@ const AssignmentOutlinePage = () => {
               onQuestionsChange={setQuestions}
               onSaveOutline={saveOutline}
               onCancel={() => navigate(`/courses/${courseId}/assignments/${assignmentId}`)}
+              isSaving={isSaving}
             />
           </Box>
         </VStack>

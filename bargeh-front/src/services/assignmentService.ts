@@ -129,7 +129,7 @@ export const assignmentService = {
         },
       });
       return response;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Assignment creation failed:', error);
       
       // Check if it's an authentication error

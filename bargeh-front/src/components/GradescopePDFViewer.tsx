@@ -29,6 +29,7 @@ interface GradescopePDFViewerProps {
   onQuestionsChange: (questions: Question[]) => void;
   onSaveOutline: () => void;
   onCancel: () => void;
+  isSaving?: boolean;
 }
 
 // Tool type removed - not needed for page-based questions
@@ -39,6 +40,7 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
   onQuestionsChange,
   onSaveOutline,
   onCancel,
+  isSaving = false,
 }) => {
   // PDF state
   const [numPages, setNumPages] = useState<number>(0);
@@ -352,6 +354,8 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
               colorScheme="blue"
               w="100%"
               onClick={onSaveOutline}
+              loading={isSaving}
+              loadingText="در حال ذخیره..."
             >
               <Icon as={FiSave} mr={2} />
               ذخیره طرح کلی
