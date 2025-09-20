@@ -1,8 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Box, VStack, HStack, Text, Button, Icon, Spinner } from '@chakra-ui/react';
-import { FiPlus, FiX, FiSave, FiZoomIn, FiZoomOut, FiRotateCw, FiMove, FiEdit3, FiSquare, FiType } from 'react-icons/fi';
+import { FiPlus, FiX, FiSave, FiZoomIn, FiZoomOut, FiRotateCw } from 'react-icons/fi';
 import { Document, Page, pdfjs } from 'react-pdf';
-import * as fabric from 'fabric';
 
 // Set up PDF.js worker - use local file from public directory
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
@@ -11,27 +10,10 @@ interface Question {
   id: string;
   title: string;
   points: number;
-  position?: {
-    pageNumber: number;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
+  pageNumber?: number;
 }
 
-// interface Annotation {
-//   id: string;
-//   type: 'text' | 'pen' | 'rectangle' | 'highlight';
-//   pageNumber: number;
-//   x: number;
-//   y: number;
-//   width?: number;
-//   height?: number;
-//   content?: string;
-//   color: string;
-//   linkedQuestionId?: string;
-// }
+// Canvas-based annotation interfaces removed - using simple page-based questions
 
 interface RubricItem {
   id: string;
@@ -49,7 +31,7 @@ interface GradescopePDFViewerProps {
   onCancel: () => void;
 }
 
-type Tool = 'select' | 'text' | 'pen' | 'rectangle' | 'highlight';
+// Tool type removed - not needed for page-based questions
 
 const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
   pdfUrl,
@@ -67,10 +49,7 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
 
-  // Annotation state
-  const [activeTool, setActiveTool] = useState<Tool>('select');
-  const [penColor] = useState<string>('#2E5BBA');
-  const [isDrawing, setIsDrawing] = useState<boolean>(false);
+  // Annotation state removed - using simple page-based questions
 
   // Debug: Log PDF URL
   React.useEffect(() => {
@@ -152,11 +131,9 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
   const [newQuestionTitle, setNewQuestionTitle] = useState('');
   const [newQuestionPoints, setNewQuestionPoints] = useState(10);
   const [isAddingQuestion, setIsAddingQuestion] = useState(false);
-  const [currentQuestionId, setCurrentQuestionId] = useState<string | null>(null);
+  // currentQuestionId removed - not needed for page-based questions
 
   // Refs
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
 
   // Rubric items (hardcoded for now)
@@ -167,31 +144,7 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
     { id: '4', title: 'Calculation error', points: -2, description: 'Mathematical error in calculation', applied: false },
   ]);
 
-  // Initialize Fabric.js canvas
-  useEffect(() => {
-    if (canvasRef.current && pageRef.current) {
-      const canvas = new fabric.Canvas(canvasRef.current, {
-        width: pageRef.current.offsetWidth,
-        height: pageRef.current.offsetHeight,
-        backgroundColor: 'transparent',
-        selection: false,
-      });
-
-      fabricCanvasRef.current = canvas;
-
-      // Set up drawing events
-      canvas.on('mouse:down', handleCanvasMouseDown);
-      canvas.on('mouse:move', handleCanvasMouseMove);
-      canvas.on('mouse:up', handleCanvasMouseUp);
-
-      // Render existing question positions
-      renderQuestionPositions();
-
-      return () => {
-        canvas.dispose();
-      };
-    }
-  }, [pageNumber, scale, questions]);
+  // Canvas functionality removed - using simple page-based questions
 
   const onDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
     console.log('PDF loaded successfully:', numPages, 'pages');
@@ -207,149 +160,9 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
     setLoading(false);
   }, [pdfUrl]);
 
-  const renderQuestionPositions = useCallback(() => {
-    if (!fabricCanvasRef.current) return;
-    
-    // Clear existing question rectangles
-    const objects = fabricCanvasRef.current.getObjects();
-    objects.forEach(obj => {
-      if ((obj as any).name === 'question-rect') {
-        fabricCanvasRef.current?.remove(obj);
-      }
-    });
-    
-    // Render question positions for current page
-    questions.forEach(question => {
-      if (question.position && question.position.pageNumber === pageNumber) {
-        const rect = new fabric.Rect({
-          left: question.position.x,
-          top: question.position.y,
-          width: question.position.width,
-          height: question.position.height,
-          fill: 'rgba(46, 91, 186, 0.1)',
-          stroke: '#2E5BBA',
-          strokeWidth: 2,
-          selectable: false,
-        });
-        
-        // Add custom properties
-        (rect as any).name = 'question-rect';
-        (rect as any).data = { questionId: question.id };
-        
-        fabricCanvasRef.current?.add(rect);
-      }
-    });
-    
-    fabricCanvasRef.current?.renderAll();
-  }, [questions, pageNumber]);
+  // Canvas rendering functions removed - using simple page-based questions
 
-  const handleCanvasMouseDown = useCallback((options: any) => {
-    if (activeTool === 'pen') {
-      setIsDrawing(true);
-      const pointer = fabricCanvasRef.current?.getPointer(options.e);
-      if (pointer) {
-        const path = new fabric.Path(`M ${pointer.x} ${pointer.y}`, {
-          stroke: penColor,
-          strokeWidth: 2,
-          fill: '',
-          selectable: false,
-        });
-        fabricCanvasRef.current?.add(path);
-        fabricCanvasRef.current?.setActiveObject(path);
-      }
-    } else if (activeTool === 'rectangle') {
-      const pointer = fabricCanvasRef.current?.getPointer(options.e);
-      if (pointer) {
-        const rect = new fabric.Rect({
-          left: pointer.x,
-          top: pointer.y,
-          width: 0,
-          height: 0,
-          fill: 'transparent',
-          stroke: penColor,
-          strokeWidth: 2,
-          selectable: false,
-        });
-        fabricCanvasRef.current?.add(rect);
-        fabricCanvasRef.current?.setActiveObject(rect);
-      }
-    }
-  }, [activeTool, penColor]);
-
-  const handleCanvasMouseMove = useCallback((options: any) => {
-    if (activeTool === 'pen' && isDrawing) {
-      const pointer = fabricCanvasRef.current?.getPointer(options.e);
-      if (pointer) {
-        const activeObject = fabricCanvasRef.current?.getActiveObject() as fabric.Path;
-        if (activeObject) {
-          const pathData = activeObject.path;
-          if (pathData && pathData.length > 0) {
-            pathData.push(['L', pointer.x, pointer.y]);
-            activeObject.set('path', pathData);
-            fabricCanvasRef.current?.renderAll();
-          }
-        }
-      }
-    } else if (activeTool === 'rectangle') {
-      const pointer = fabricCanvasRef.current?.getPointer(options.e);
-      if (pointer) {
-        const activeObject = fabricCanvasRef.current?.getActiveObject() as fabric.Rect;
-        if (activeObject) {
-          const startX = activeObject.left || 0;
-          const startY = activeObject.top || 0;
-          const width = pointer.x - startX;
-          const height = pointer.y - startY;
-          
-          activeObject.set({
-            width: Math.abs(width),
-            height: Math.abs(height),
-            left: width < 0 ? pointer.x : startX,
-            top: height < 0 ? pointer.y : startY,
-          });
-          fabricCanvasRef.current?.renderAll();
-        }
-      }
-    }
-  }, [activeTool, isDrawing]);
-
-  const handleCanvasMouseUp = useCallback(() => {
-    setIsDrawing(false);
-    
-    // If we're positioning a question and have an active rectangle
-    if (activeTool === 'rectangle' && currentQuestionId && fabricCanvasRef.current) {
-      const activeObject = fabricCanvasRef.current.getActiveObject() as fabric.Rect;
-      if (activeObject) {
-        // Get the rectangle dimensions and position
-        const rect = activeObject;
-        const position = {
-          pageNumber: pageNumber,
-          x: rect.left || 0,
-          y: rect.top || 0,
-          width: rect.width || 0,
-          height: rect.height || 0,
-        };
-        
-        // Update the question with the position
-        const updatedQuestions = questions.map(q => 
-          q.id === currentQuestionId 
-            ? { ...q, position }
-            : q
-        );
-        
-        onQuestionsChange(updatedQuestions);
-        
-        // Reset the tool and clear the current question
-        setActiveTool('select');
-        setCurrentQuestionId(null);
-        
-        // Remove the rectangle from canvas
-        fabricCanvasRef.current.remove(rect);
-        fabricCanvasRef.current.renderAll();
-        
-        console.log('Question positioned:', currentQuestionId, position);
-      }
-    }
-  }, [activeTool, currentQuestionId, pageNumber, questions, onQuestionsChange]);
+  // Canvas mouse event handlers removed - using simple page-based questions
 
   const addQuestion = useCallback(() => {
     if (!newQuestionTitle.trim()) return;
@@ -358,24 +171,24 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
       id: `question-${Date.now()}`,
       title: newQuestionTitle,
       points: newQuestionPoints,
+      pageNumber: pageNumber, // Just specify the page number
     };
+
+    console.log('Adding question for page:', pageNumber);
 
     onQuestionsChange([...questions, newQuestion]);
     setNewQuestionTitle('');
     setNewQuestionPoints(10);
     setIsAddingQuestion(false);
-  }, [newQuestionTitle, newQuestionPoints, questions, onQuestionsChange]);
+    
+    console.log('Question added for page:', pageNumber);
+  }, [newQuestionTitle, newQuestionPoints, questions, onQuestionsChange, pageNumber]);
 
   const removeQuestion = useCallback((questionId: string) => {
     onQuestionsChange(questions.filter(q => q.id !== questionId));
   }, [questions, onQuestionsChange]);
 
-  const selectQuestionRegion = useCallback((questionId: string) => {
-    setActiveTool('rectangle');
-    // Store the question ID for positioning
-    setCurrentQuestionId(questionId);
-    console.log('Selecting region for question:', questionId);
-  }, []);
+  // selectQuestionRegion function removed - questions are now automatically positioned
 
   const applyRubricItem = useCallback((rubricItemId: string) => {
     // TODO: Implement rubric application
@@ -489,10 +302,10 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
               <Box
                 key={question.id}
                 p={3}
-                bg={question.position ? "green.50" : "yellow.50"}
+                bg={question.pageNumber ? "green.50" : "yellow.50"}
                 borderRadius="md"
                 border="1px solid"
-                borderColor={question.position ? "green.200" : "yellow.200"}
+                borderColor={question.pageNumber ? "green.200" : "yellow.200"}
               >
                 <VStack align="stretch" gap={2}>
                   <HStack justify="space-between">
@@ -514,23 +327,19 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
                   <Text fontSize="xs" color="blue.600" fontWeight="medium">
                     {question.points} نمره
                   </Text>
-                  {question.position ? (
-                    <Text fontSize="xs" color="green.600">
-                      ✓ موقعیت مشخص شده
-                    </Text>
-                  ) : currentQuestionId === question.id ? (
-                    <Text fontSize="xs" color="blue.600" fontWeight="medium">
-                      🔄 در حال تعیین موقعیت...
-                    </Text>
+                  {question.pageNumber ? (
+                    <VStack align="stretch" gap={1}>
+                      <Text fontSize="xs" color="green.600">
+                        ✓ صفحه مشخص شده
+                      </Text>
+                      <Text fontSize="xs" color="gray.500">
+                        صفحه {question.pageNumber}
+                      </Text>
+                    </VStack>
                   ) : (
-                    <Button
-                      size="xs"
-                      colorScheme="blue"
-                      variant="outline"
-                      onClick={() => selectQuestionRegion(question.id)}
-                    >
-                      انتخاب موقعیت
-                    </Button>
+                    <Text fontSize="xs" color="yellow.600">
+                      ⚠️ صفحه در حال بارگذاری...
+                    </Text>
                   )}
                 </VStack>
               </Box>
@@ -563,45 +372,7 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
         {/* Toolbar */}
         <Box p={2} bg="gray.50" borderBottom="1px solid" borderColor="gray.200">
           <HStack gap={2} justify="space-between">
-            {/* Left tools */}
-            <HStack gap={1}>
-              <Button
-                size="sm"
-                variant={activeTool === 'select' ? 'solid' : 'outline'}
-                colorScheme={activeTool === 'select' ? 'blue' : 'gray'}
-                onClick={() => setActiveTool('select')}
-                title="انتخاب (V)"
-              >
-                <Icon as={FiMove} />
-              </Button>
-              <Button
-                size="sm"
-                variant={activeTool === 'text' ? 'solid' : 'outline'}
-                colorScheme={activeTool === 'text' ? 'blue' : 'gray'}
-                onClick={() => setActiveTool('text')}
-                title="متن (T)"
-              >
-                <Icon as={FiType} />
-              </Button>
-              <Button
-                size="sm"
-                variant={activeTool === 'pen' ? 'solid' : 'outline'}
-                colorScheme={activeTool === 'pen' ? 'blue' : 'gray'}
-                onClick={() => setActiveTool('pen')}
-                title="قلم (P)"
-              >
-                <Icon as={FiEdit3} />
-              </Button>
-              <Button
-                size="sm"
-                variant={activeTool === 'rectangle' ? 'solid' : 'outline'}
-                colorScheme={activeTool === 'rectangle' ? 'blue' : 'gray'}
-                onClick={() => setActiveTool('rectangle')}
-                title="مستطیل (R)"
-              >
-                <Icon as={FiSquare} />
-              </Button>
-            </HStack>
+            {/* Annotation tools removed - using simple page-based questions */}
 
             {/* Center controls */}
             <HStack gap={1}>
@@ -636,11 +407,8 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
 
         {/* PDF Viewer */}
         <Box position="relative" h="calc(100% - 60px)" overflow="auto">
-          <Box ref={pageRef} position="relative" display="inline-block">
-            {(() => {
-              console.log('Rendering PDF viewer, pdfBlobUrl:', pdfBlobUrl ? 'exists' : 'null', 'loading:', loading);
-              return null;
-            })()}
+          <Box ref={pageRef} position="relative" display="inline-block" style={{ position: 'relative' }}>
+            {/* Debug logging removed to reduce console spam */}
             {pdfBlobUrl ? (
               <Document
                 key={`pdf-${pdfUrl}-${pdfBlobUrl}`} // Force re-render with unique key
@@ -665,18 +433,6 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
                 </VStack>
               </Box>
             )}
-            
-            {/* Annotation Canvas Overlay */}
-            <canvas
-              ref={canvasRef}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                pointerEvents: activeTool === 'select' ? 'none' : 'auto',
-                zIndex: 10,
-              }}
-            />
           </Box>
         </Box>
       </Box>
