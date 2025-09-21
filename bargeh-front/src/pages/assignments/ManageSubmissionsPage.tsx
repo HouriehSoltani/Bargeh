@@ -32,6 +32,9 @@ interface Submission {
   num_pages: number;
   created_at: string;
   mapping_status: 'complete' | 'incomplete';
+  grading_progress: number;
+  total_questions: number;
+  graded_questions: number;
 }
 
 interface UpdateFileModalProps {
@@ -509,12 +512,13 @@ const ManageSubmissionsPage = () => {
                           <Box as="td" p={3}>
                             <Text
                               as="button"
-                              color={textColor}
+                              color="blue.500"
                               fontWeight="medium"
                               textAlign="right"
                               cursor="pointer"
+                              textDecoration="underline"
                               _hover={{ 
-                                color: "blue.500",
+                                color: "blue.700",
                                 textDecoration: "underline"
                               }}
                               onClick={() => {
@@ -540,14 +544,14 @@ const ManageSubmissionsPage = () => {
                                 overflow="hidden"
                               >
                                 <Box
-                                  width={submission.mapping_status === 'complete' ? "100%" : "0%"}
+                                  width={`${submission.grading_progress}%`}
                                   height="100%"
-                                  bg={submission.mapping_status === 'complete' ? "green.500" : "gray.500"}
+                                  bg={submission.grading_progress === 100 ? "green.500" : submission.grading_progress > 0 ? "blue.500" : "gray.500"}
                                   borderRadius="md"
                                 />
                               </Box>
                               <Text fontSize="xs" color={subtleText}>
-                                {submission.mapping_status === 'complete' ? '۱۰۰٪' : '۰٪'}
+                                {submission.graded_questions}/{submission.total_questions} ({submission.grading_progress}%)
                               </Text>
                             </VStack>
                           </Box>

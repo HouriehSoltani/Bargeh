@@ -35,7 +35,6 @@ interface FormData {
   anonymizedGrading: boolean;
   uploadByStudent: 'student' | 'instructor';
   dueAt: string;
-  totalPoints: number;
   regradeEnabled: boolean;
 }
 
@@ -86,7 +85,6 @@ const CreateAssignmentMerged = () => {
     anonymizedGrading: false,
     uploadByStudent: 'student',
     dueAt: '',
-    totalPoints: 100,
     regradeEnabled: true
   });
 
@@ -496,25 +494,6 @@ const CreateAssignmentMerged = () => {
                     </VStack>
                   )}
 
-                  {/* Points */}
-                  <VStack align="stretch" gap={2}>
-                    <Text fontWeight="medium" color={textColor}>نمره کل تکلیف</Text>
-                    <Input
-                      type="number"
-                      value={formData.totalPoints}
-                      onChange={(e: any) => handleInputChange('totalPoints', parseInt(e.target.value) || 0)}
-                      min={1}
-                      max={1000}
-                      size="sm"
-                      fontSize="sm"
-                      pr={4}
-                      bg={inputBg}
-                      border="1px solid"
-                      borderColor={inputBorder}
-                      borderRadius="md"
-                      _placeholder={{ pr: 4, fontSize: "sm" }}
-                    />
-                  </VStack>
                   </VStack>
                 </Box>
               )}

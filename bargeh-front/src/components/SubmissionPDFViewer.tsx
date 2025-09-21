@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Box, VStack, HStack, Text, Button, Icon, Spinner } from '@chakra-ui/react';
 import { FiZoomIn, FiZoomOut, FiRotateCw, FiCheck } from 'react-icons/fi';
 import { Document, Page, pdfjs } from 'react-pdf';

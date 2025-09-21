@@ -40,7 +40,7 @@ export const questionService = {
       });
       
       console.log('Update response:', response);
-      return response; // API service already extracts .data
+      return response as Question[]; // API service already extracts .data
     } catch (error: any) {
       console.error('Error updating questions:', error);
       console.error('Error response:', error.response?.data);
@@ -56,7 +56,7 @@ export const questionService = {
       const response = await api.get(`/api/assignments/${assignmentId}/questions/`);
       
       console.log('Get questions response:', response);
-      return response; // API service already extracts .data
+      return response as Question[]; // API service already extracts .data
     } catch (error: any) {
       console.error('Error fetching questions:', error);
       console.error('Error response:', error.response?.data);

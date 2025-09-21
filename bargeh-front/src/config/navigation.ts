@@ -115,8 +115,8 @@ export const getAssignmentNavigationConfig = (courseId: string, assignmentId: st
 
 // Function to get navigation config based on user role (simplified)
 export const getNavigationConfig = (pathname: string, courseId?: string, userRole?: 'instructor' | 'student', courseTitle?: string, assignmentTitle?: string): SidebarConfig => {
-  // Check if this is an assignment page (outline or submissions)
-  const assignmentMatch = pathname.match(/^\/courses\/(\d+)\/assignments\/(\d+)\/(outline|submissions)/);
+  // Check if this is an assignment page (outline, submissions, grade, or questions)
+  const assignmentMatch = pathname.match(/^\/courses\/(\d+)\/assignments\/(\d+)\/(outline|submissions|grade|questions)/);
   if (assignmentMatch) {
     const [, courseId, assignmentId] = assignmentMatch;
     return getAssignmentNavigationConfig(courseId, assignmentId, courseTitle, assignmentTitle);

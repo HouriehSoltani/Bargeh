@@ -53,7 +53,7 @@ const DynamicSidebar = ({
   const location = useLocation();
   
   // Get assignment data if we're on an assignment page
-  const assignmentMatch = location.pathname.match(/^\/courses\/(\d+)\/assignments\/(\d+)\/(outline|submissions)/);
+  const assignmentMatch = location.pathname.match(/^\/courses\/(\d+)\/assignments\/(\d+)\/(outline|submissions|grade|questions)/);
   const assignmentId = assignmentMatch ? assignmentMatch[2] : undefined;
   const { assignment } = useAssignment(assignmentId);
   const { user, isAuthenticated, logout } = useAuth();
@@ -105,6 +105,16 @@ const DynamicSidebar = ({
     if (path.startsWith('/courses/') && location.pathname.startsWith('/courses/')) {
       const pathParts = path.split('/');
       const locationParts = location.pathname.split('/');
+      
+      // Special case: highlight grading tab when on question submissions page
+      if (path.endsWith('/grade') && location.pathname.includes('/questions/')) {
+        return true;
+      }
+      
+      // Don't highlight submissions tab when on question pages
+      if (path.endsWith('/submissions') && location.pathname.includes('/questions/')) {
+        return false;
+      }
       
       // If the last part of both paths match (e.g., 'assignments')
       if (pathParts.length >= 3 && locationParts.length >= 3) {

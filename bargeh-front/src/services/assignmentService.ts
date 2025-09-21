@@ -106,8 +106,7 @@ export const assignmentService = {
           formData.append('template_pdf', value);
         } else if (value !== null && value !== undefined) {
           // Convert camelCase to snake_case for backend
-          const backendKey = key === 'totalPoints' ? 'total_points' : 
-                           key === 'isPublished' ? 'is_published' :
+          const backendKey = key === 'isPublished' ? 'is_published' :
                            key === 'regradeEnabled' ? 'regrade_enabled' :
                            key === 'dueAt' ? 'due_at' :
                            key === 'uploadByStudent' ? 'upload_by_student' :

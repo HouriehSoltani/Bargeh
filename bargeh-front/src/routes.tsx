@@ -10,6 +10,9 @@ import CreateAssignmentMerged from "./pages/assignments/CreateAssignmentPage";
 import AssignmentOutlinePage from "./pages/assignments/AssignmentOutlinePage";
 import ManageSubmissionsPage from "./pages/assignments/ManageSubmissionsPage";
 import SubmissionOutlinePage from "./pages/assignments/SubmissionOutlinePage";
+import GradingDashboardPage from "./pages/assignments/GradingDashboardPage";
+import QuestionSubmissionsPage from "./pages/assignments/QuestionSubmissionsPage";
+import SubmissionGradingPage from "./pages/assignments/SubmissionGradingPage";
 import ProfilePage from "./pages/ProfilePage";
 import { RequireAuth } from "./components/RequireAuth";
 import RoleBasedRouter from "./components/RoleBasedRouter";
@@ -53,6 +56,18 @@ const router = createBrowserRouter([
              {
                path: "courses/:courseId/assignments/:assignmentId/submissions/:submissionId/outline",
                element: <SubmissionOutlinePage />
+             },
+             {
+               path: "courses/:courseId/assignments/:assignmentId/grade",
+               element: <GradingDashboardPage />
+             },
+             {
+               path: "courses/:courseId/assignments/:assignmentId/questions/:questionId/submissions",
+               element: <QuestionSubmissionsPage />
+             },
+             {
+               path: "courses/:courseId/assignments/:assignmentId/questions/:questionId/submissions/:submissionId/grade",
+               element: <SubmissionGradingPage />
              },
       { 
         path: "courses/:courseId/roster", 
