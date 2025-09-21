@@ -11,13 +11,14 @@ import {
   Icon,
   Heading,
   Spinner,
+  Input,
 } from '@chakra-ui/react';
-import { FiUpload, FiChevronDown, FiChevronUp, FiArrowLeft } from 'react-icons/fi';
+import { FiUpload, FiChevronDown, FiChevronUp, FiArrowLeft, FiTrash2, FiEdit3 } from 'react-icons/fi';
 import { useColorModeValue } from '@/hooks/useColorMode';
 import { useAssignment } from '@/hooks/useAssignment';
 import { useRoster } from '@/hooks/useRoster';
 import DynamicSidebar from '@/components/DynamicSidebar';
-import UploadSubmissionModal from '@/components/UploadSubmissionModal';
+import UploadSubmissionModal from '@/components/UploadSubmissionPopup';
 import { api } from '@/services/api';
 
 interface Submission {
@@ -32,6 +33,125 @@ interface Submission {
   created_at: string;
   mapping_status: 'complete' | 'incomplete';
 }
+
+interface UpdateFileModalProps {
+  onSubmit: (file: File) => void;
+  onCancel: () => void;
+  isUploading: boolean;
+}
+
+const UpdateFileModal: React.FC<UpdateFileModalProps> = ({ onSubmit, onCancel, isUploading }) => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [dragActive, setDragActive] = useState(false);
+
+  const handleFileSelect = (file: File) => {
+    if (file.type === 'application/pdf') {
+      setSelectedFile(file);
+    } else {
+      alert('لطفاً فقط فایل‌های PDF انتخاب کنید');
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragActive(false);
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFileSelect(files[0]);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragActive(true);
+  };
+
+  const handleDragLeave = () => {
+    setDragActive(false);
+  };
+
+  const handleSubmit = () => {
+    if (selectedFile) {
+      onSubmit(selectedFile);
+    }
+  };
+
+  return (
+    <VStack align="stretch" gap={4}>
+      <Box
+        border="2px dashed"
+        borderColor={dragActive ? "blue.400" : "gray.300"}
+        borderRadius="md"
+        p={6}
+        textAlign="center"
+        bg={dragActive ? "blue.50" : "gray.50"}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        cursor="pointer"
+        _hover={{ borderColor: "blue.400", bg: "blue.50" }}
+      >
+        <VStack gap={2}>
+          <Icon as={FiUpload} boxSize={8} color="gray.500" />
+          <Text fontSize="sm" color="gray.600">
+            فایل PDF را اینجا بکشید یا کلیک کنید
+          </Text>
+          <Input
+            type="file"
+            accept=".pdf"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFileSelect(file);
+            }}
+            display="none"
+            id="file-upload"
+          />
+          <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
+            <Button
+              size="sm"
+              variant="outline"
+              pointerEvents="none"
+            >
+              انتخاب فایل
+            </Button>
+          </label>
+        </VStack>
+      </Box>
+
+      {selectedFile && (
+        <Box p={3} bg="green.50" borderRadius="md" border="1px solid" borderColor="green.200">
+          <Text fontSize="sm" color="green.700">
+            فایل انتخاب شده: {selectedFile.name}
+          </Text>
+          <Text fontSize="xs" color="green.600">
+            حجم: {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+          </Text>
+        </Box>
+      )}
+
+      <HStack justify="center" gap={3} mt={4}>
+        <Button
+          paddingX={4}
+          variant="outline"
+          onClick={onCancel}
+          disabled={isUploading}
+        >
+          انصراف
+        </Button>
+        <Button
+          paddingX={4}
+          colorScheme="blue"
+          onClick={handleSubmit}
+          loading={isUploading}
+          loadingText="در حال آپلود..."
+          disabled={!selectedFile}
+        >
+          به‌روزرسانی فایل
+        </Button>
+      </HStack>
+    </VStack>
+  );
+};
 
 
 const ManageSubmissionsPage = () => {
@@ -49,6 +169,12 @@ const ManageSubmissionsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [submissionToDelete, setSubmissionToDelete] = useState<{ id: number; student_name: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [submissionToUpdate, setSubmissionToUpdate] = useState<{ id: number; student_name: string } | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
@@ -79,14 +205,16 @@ const ManageSubmissionsPage = () => {
     try {
       console.log('Loading submissions for assignment:', assignmentId);
       const response = await api.get(`/api/assignments/${assignmentId}/submissions/`);
-      const submissionsData = (response as any).data;
-      console.log('Submissions API response:', response);
-      console.log('Submissions data:', submissionsData);
-      console.log('Submissions results:', submissionsData?.results);
-      console.log('Submissions count:', submissionsData?.count);
+      console.log('Full API response:', response);
+      console.log('Response data:', (response as any).data);
       
-      // For testing - add a mock submission if none exist
+      // The response structure is directly {results: Array, count: number}
+      // Not nested under a 'data' property
+      const submissionsData = (response as any).data || response;
       const results = submissionsData?.results || [];
+      
+      console.log('Submissions results:', results);
+      console.log('Submissions count:', submissionsData?.count);
       if (results.length === 0) {
         console.log('No submissions found, adding mock data for testing');
         const mockSubmission: Submission = {
@@ -115,16 +243,100 @@ const ManageSubmissionsPage = () => {
     }
   };
 
+  const handleDeleteSubmission = (submission: Submission) => {
+    setSubmissionToDelete({
+      id: submission.id,
+      student_name: submission.student_name || 'نامشخص'
+    });
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!submissionToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      console.log('Deleting submission:', submissionToDelete.id);
+      
+      await api.delete(`/api/assignments/submissions/${submissionToDelete.id}/delete/`);
+      
+      console.log('Submission deleted successfully');
+      alert('ارسال با موفقیت حذف شد');
+      
+      // Reload submissions
+      await loadData();
+      
+      // Close modal
+      setShowDeleteModal(false);
+      setSubmissionToDelete(null);
+    } catch (error) {
+      console.error('Error deleting submission:', error);
+      alert('خطا در حذف ارسال: ' + (error as any).response?.data?.error || (error as any).message);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleUpdateSubmission = (submission: Submission) => {
+    setSubmissionToUpdate({
+      id: submission.id,
+      student_name: submission.student_name || 'نامشخص'
+    });
+    setShowUpdateModal(true);
+  };
+
+  const handleConfirmUpdate = async (file: File) => {
+    if (!submissionToUpdate) return;
+
+    setIsUpdating(true);
+    try {
+      console.log('Updating submission:', submissionToUpdate.id);
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await api.put(`/api/assignments/submissions/${submissionToUpdate.id}/update-file/`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      console.log('Update response:', response);
+      console.log('Submission updated successfully');
+      alert('فایل ارسال با موفقیت به‌روزرسانی شد');
+      
+      // Reload submissions
+      await loadData();
+      
+      // Close modal
+      setShowUpdateModal(false);
+      setSubmissionToUpdate(null);
+    } catch (error) {
+      console.error('Error updating submission:', error);
+      alert('خطا در به‌روزرسانی فایل ارسال: ' + (error as any).response?.data?.error || (error as any).message);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   const handleModalUpload = async (studentId: number | null, file: File) => {
     setIsUploading(true);
     try {
       const formData = new FormData();
       formData.append('files', file);
       if (studentId) {
-        formData.append('student_id', studentId.toString());
+        formData.append('student_ids', studentId.toString()); // Backend expects 'student_ids' (plural)
+        console.log('Uploading for student ID:', studentId);
+      } else {
+        console.log('No student ID provided - uploading as unassigned');
       }
 
       console.log('Uploading to:', `/api/assignments/${assignmentId}/submissions/upload/`);
+      console.log('FormData contents:');
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
+      
       const response = await api.post(`/api/assignments/${assignmentId}/submissions/upload/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -132,13 +344,25 @@ const ManageSubmissionsPage = () => {
       });
 
       console.log('Upload response:', response);
-      alert('فایل با موفقیت آپلود شد');
-
-      // Reload submissions
-      await loadData();
       
-      // Navigate to question specification page
-      navigate(`/courses/${courseId}/assignments/${assignmentId}/questions`);
+      // Get the uploaded submission data - response structure is {message, submissions: [submission]}
+      const responseData = (response as any).data || response;
+      console.log('Response data:', responseData);
+      const uploadedSubmission = responseData.submissions?.[0];
+      console.log('Uploaded submission:', uploadedSubmission);
+      
+      if (uploadedSubmission) {
+        console.log('Navigating to submission outline page...');
+        // Navigate to submission outline page
+        navigate(`/courses/${courseId}/assignments/${assignmentId}/submissions/${uploadedSubmission.id}/outline`, {
+          state: { submission: uploadedSubmission }
+        });
+      } else {
+        console.log('No submission data found, reloading submissions...');
+        alert('فایل با موفقیت آپلود شد');
+        // Reload submissions
+        await loadData();
+      }
     } catch (error) {
       console.error('Error uploading file:', error);
       alert("خطا در آپلود فایل");
@@ -247,12 +471,15 @@ const ManageSubmissionsPage = () => {
                           <Icon as={FiChevronUp} boxSize={3} />
                         </HStack>
                       </Box>
+                      <Box as="th" p={3} textAlign="center" color={textColor} fontWeight="semibold">
+                        عملیات
+                      </Box>
                     </Box>
                   </Box>
                   <Box as="tbody">
                     {isLoading ? (
                       <Box as="tr">
-                        <Box as="td" p={6} textAlign="center" {...{ colSpan: 3 }}>
+                        <Box as="td" p={6} textAlign="center" {...{ colSpan: 4 }}>
                           <VStack>
                             <Spinner size="md" color="blue.500" />
                             <Text color={textColor}>در حال بارگذاری ارسال‌ها...</Text>
@@ -261,7 +488,7 @@ const ManageSubmissionsPage = () => {
                       </Box>
                     ) : !submissions || submissions.length === 0 ? (
                       <Box as="tr">
-                        <Box as="td" p={6} textAlign="center" {...{ colSpan: 3 }}>
+                        <Box as="td" p={6} textAlign="center" {...{ colSpan: 4 }}>
                           <VStack>
                             <Text color={subtleText} fontSize="md">هیچ ارسالی یافت نشد.</Text>
                             <Text fontSize="xs" color="gray.300" mt={2}>
@@ -279,8 +506,25 @@ const ManageSubmissionsPage = () => {
                           borderColor={borderColor}
                           _hover={{ bg: tableRowHover }}
                         >
-                          <Box as="td" p={3} color={textColor} fontWeight="medium">
-                            {submission.student_name || 'نامشخص'}
+                          <Box as="td" p={3}>
+                            <Text
+                              as="button"
+                              color={textColor}
+                              fontWeight="medium"
+                              textAlign="right"
+                              cursor="pointer"
+                              _hover={{ 
+                                color: "blue.500",
+                                textDecoration: "underline"
+                              }}
+                              onClick={() => {
+                                navigate(`/courses/${courseId}/assignments/${assignmentId}/submissions/${submission.id}/outline`, {
+                                  state: { submission }
+                                });
+                              }}
+                            >
+                              {submission.student_name || 'نامشخص'}
+                            </Text>
                           </Box>
                           <Box as="td" p={3} color={subtleText}>
                             {new Date(submission.created_at).toLocaleDateString('fa-IR')}
@@ -306,6 +550,28 @@ const ManageSubmissionsPage = () => {
                                 {submission.mapping_status === 'complete' ? '۱۰۰٪' : '۰٪'}
                               </Text>
                             </VStack>
+                          </Box>
+                          <Box as="td" p={3} textAlign="center">
+                            <HStack gap={2} justify="center">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                colorScheme="blue"
+                                onClick={() => handleUpdateSubmission(submission)}
+                                title="به‌روزرسانی فایل"
+                              >
+                                <Icon as={FiEdit3} />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                colorScheme="red"
+                                onClick={() => handleDeleteSubmission(submission)}
+                                title="حذف ارسال"
+                              >
+                                <Icon as={FiTrash2} />
+                              </Button>
+                            </HStack>
                           </Box>
                         </Box>
                       ))
@@ -344,7 +610,7 @@ const ManageSubmissionsPage = () => {
               disabled={isUploading}
             >
               <Icon as={FiUpload} mr={2} />
-              آپلود ارسال
+              آپلود تکلیف
             </Button>
           
           <Button
@@ -370,6 +636,108 @@ const ManageSubmissionsPage = () => {
         students={students}
         isUploading={isUploading}
       />
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && submissionToDelete && (
+        <Box
+          position="fixed"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          bg="blackAlpha.600"
+          zIndex={1000}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Box
+            bg={bgColor}
+            borderRadius="lg"
+            p={6}
+            maxW="400px"
+            w="90%"
+            boxShadow="xl"
+          >
+            <VStack align="stretch" gap={4}>
+              <Text fontSize="lg" fontWeight="bold" color={textColor} textAlign="center">
+                حذف ارسال
+              </Text>
+              <Text fontSize="sm" color="red.500" textAlign="center">
+                آیا مطمئن هستید که می‌خواهید ارسال "{submissionToDelete.student_name}" را حذف کنید؟
+              </Text>
+              <Text fontSize="xs" color={subtleText} textAlign="center">
+                این عمل قابل بازگشت نیست.
+              </Text>
+              <HStack justify="center" gap={3} mt={4}>
+                <Button
+                  paddingX={2}
+                  variant="outline"
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setSubmissionToDelete(null);
+                  }}
+                  disabled={isDeleting}
+                >
+                  انصراف
+                </Button>
+                <Button
+                  paddingX={2}
+                  colorScheme="red"
+                  onClick={handleConfirmDelete}
+                  loading={isDeleting}
+                  loadingText="در حال حذف..."
+                >
+                  حذف
+                </Button>
+              </HStack>
+            </VStack>
+          </Box>
+        </Box>
+      )}
+
+      {/* Update File Modal */}
+      {showUpdateModal && submissionToUpdate && (
+        <Box
+          position="fixed"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          bg="blackAlpha.600"
+          zIndex={1000}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Box
+            bg={bgColor}
+            borderRadius="lg"
+            p={6}
+            maxW="500px"
+            w="90%"
+            boxShadow="xl"
+          >
+            <VStack align="stretch" gap={4}>
+              <Text fontSize="lg" fontWeight="bold" color={textColor} textAlign="center">
+                به‌روزرسانی فایل ارسال
+              </Text>
+              <Text fontSize="sm" color={textColor} textAlign="center">
+                فایل جدید برای ارسال "{submissionToUpdate.student_name}" را انتخاب کنید
+              </Text>
+              
+              <UpdateFileModal
+                onSubmit={handleConfirmUpdate}
+                onCancel={() => {
+                  setShowUpdateModal(false);
+                  setSubmissionToUpdate(null);
+                }}
+                isUploading={isUpdating}
+              />
+            </VStack>
+          </Box>
+        </Box>
+      )}
     </Grid>
   );
 };

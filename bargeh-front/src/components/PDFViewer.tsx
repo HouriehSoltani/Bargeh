@@ -15,13 +15,6 @@ interface Question {
 
 // Canvas-based annotation interfaces removed - using simple page-based questions
 
-interface RubricItem {
-  id: string;
-  title: string;
-  points: number;
-  description?: string;
-  applied: boolean;
-}
 
 interface GradescopePDFViewerProps {
   pdfUrl: string;
@@ -52,7 +45,7 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
   const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
 
   // Annotation state removed - using simple page-based questions
-
+  
   // Debug: Log PDF URL
   React.useEffect(() => {
     console.log('GradescopePDFViewer - PDF URL:', pdfUrl);
@@ -138,13 +131,6 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
   // Refs
   const pageRef = useRef<HTMLDivElement>(null);
 
-  // Rubric items (hardcoded for now)
-  const [rubricItems] = useState<RubricItem[]>([
-    { id: '1', title: 'Correct answer', points: 10, description: 'Full points for correct solution', applied: false },
-    { id: '2', title: 'Partial credit', points: 5, description: 'Some correct steps shown', applied: false },
-    { id: '3', title: 'Missing units', points: -1, description: 'Answer missing proper units', applied: false },
-    { id: '4', title: 'Calculation error', points: -2, description: 'Mathematical error in calculation', applied: false },
-  ]);
 
   // Canvas functionality removed - using simple page-based questions
 
@@ -170,13 +156,14 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
     if (!newQuestionTitle.trim()) return;
 
     const newQuestion: Question = {
-      id: `question-${Date.now()}`,
-      title: newQuestionTitle,
-      points: newQuestionPoints,
-      pageNumber: pageNumber, // Just specify the page number
+      id: `question-${Date.now()}-${Math.random()}`,
+      title: newQuestionTitle.trim(),
+      points: Number(newQuestionPoints) || 0,
+      pageNumber: Number(pageNumber), // Ensure it's a number
     };
 
     console.log('Adding question for page:', pageNumber);
+    console.log('New question:', newQuestion);
 
     onQuestionsChange([...questions, newQuestion]);
     setNewQuestionTitle('');
@@ -184,6 +171,7 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
     setIsAddingQuestion(false);
     
     console.log('Question added for page:', pageNumber);
+    console.log('Updated questions array:', [...questions, newQuestion]);
   }, [newQuestionTitle, newQuestionPoints, questions, onQuestionsChange, pageNumber]);
 
   const removeQuestion = useCallback((questionId: string) => {
@@ -192,15 +180,7 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
 
   // selectQuestionRegion function removed - questions are now automatically positioned
 
-  const applyRubricItem = useCallback((rubricItemId: string) => {
-    // TODO: Implement rubric application
-    console.log('Applying rubric item:', rubricItemId);
-  }, []);
-
   const totalPoints = questions.reduce((sum, q) => sum + q.points, 0);
-  const appliedRubricPoints = rubricItems
-    .filter(item => item.applied)
-    .reduce((sum, item) => sum + item.points, 0);
 
   if (loading) {
     return (
@@ -227,151 +207,7 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
 
   return (
     <Box w="100%" h="100%" display="flex" gap={4}>
-      {/* Left Panel - Question Management */}
-      <Box w="300px" bg="white" borderRadius="lg" p={4} boxShadow="sm">
-        <VStack align="stretch" gap={4} h="100%">
-          {/* Header */}
-          <Text fontSize="lg" fontWeight="bold" color="gray.800">
-            مدیریت سوالات
-          </Text>
-
-          {/* Total Points */}
-          <Box bg="blue.50" p={3} borderRadius="md">
-            <Text fontSize="sm" color="blue.600" fontWeight="medium">
-              مجموع نمرات: {totalPoints}
-            </Text>
-            <Text fontSize="xs" color="blue.500">
-              نمرات اعمال شده: {appliedRubricPoints}
-            </Text>
-          </Box>
-
-          {/* Add Question Form */}
-          {isAddingQuestion ? (
-            <VStack align="stretch" gap={3} p={3} bg="gray.50" borderRadius="md">
-              <Text fontSize="sm" fontWeight="medium" color="gray.700">
-                افزودن سوال جدید
-              </Text>
-              <input
-                type="text"
-                placeholder="عنوان سوال"
-                value={newQuestionTitle}
-                onChange={(e) => setNewQuestionTitle(e.target.value)}
-                style={{
-                  padding: '8px 12px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                }}
-              />
-              <input
-                type="number"
-                placeholder="نمره"
-                value={newQuestionPoints}
-                onChange={(e) => setNewQuestionPoints(Number(e.target.value))}
-                min="1"
-                style={{
-                  padding: '8px 12px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                }}
-              />
-              <HStack gap={2}>
-                <Button size="sm" colorScheme="blue" onClick={addQuestion}>
-                  <Icon as={FiPlus} mr={1} />
-                  افزودن
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => setIsAddingQuestion(false)}>
-                  <Icon as={FiX} mr={1} />
-                  انصراف
-                </Button>
-              </HStack>
-            </VStack>
-          ) : (
-            <Button
-              colorScheme="blue"
-              variant="outline"
-              onClick={() => setIsAddingQuestion(true)}
-            >
-              <Icon as={FiPlus} mr={2} />
-              افزودن سوال
-            </Button>
-          )}
-
-          {/* Questions List */}
-          <VStack align="stretch" gap={2} flex="1" overflowY="auto">
-            {questions.map((question, index) => (
-              <Box
-                key={question.id}
-                p={3}
-                bg={question.pageNumber ? "green.50" : "yellow.50"}
-                borderRadius="md"
-                border="1px solid"
-                borderColor={question.pageNumber ? "green.200" : "yellow.200"}
-              >
-                <VStack align="stretch" gap={2}>
-                  <HStack justify="space-between">
-                    <Text fontSize="sm" fontWeight="medium" color="gray.800">
-                      سوال {index + 1}
-                    </Text>
-                    <Button
-                      size="xs"
-                      colorScheme="red"
-                      variant="ghost"
-                      onClick={() => removeQuestion(question.id)}
-                    >
-                      <Icon as={FiX} />
-                    </Button>
-                  </HStack>
-                  <Text fontSize="sm" color="gray.600">
-                    {question.title}
-                  </Text>
-                  <Text fontSize="xs" color="blue.600" fontWeight="medium">
-                    {question.points} نمره
-                  </Text>
-                  {question.pageNumber ? (
-                    <VStack align="stretch" gap={1}>
-                      <Text fontSize="xs" color="green.600">
-                        ✓ صفحه مشخص شده
-                      </Text>
-                      <Text fontSize="xs" color="gray.500">
-                        صفحه {question.pageNumber}
-                      </Text>
-                    </VStack>
-                  ) : (
-                    <Text fontSize="xs" color="yellow.600">
-                      ⚠️ صفحه در حال بارگذاری...
-                    </Text>
-                  )}
-                </VStack>
-              </Box>
-            ))}
-          </VStack>
-
-          {/* Action Buttons */}
-          <VStack gap={2}>
-            <Button
-              colorScheme="blue"
-              w="100%"
-              onClick={onSaveOutline}
-              loading={isSaving}
-              loadingText="در حال ذخیره..."
-            >
-              <Icon as={FiSave} mr={2} />
-              ذخیره طرح کلی
-            </Button>
-            <Button
-              variant="outline"
-              w="100%"
-              onClick={onCancel}
-            >
-              انصراف
-            </Button>
-          </VStack>
-        </VStack>
-      </Box>
-
-      {/* Middle Panel - PDF Viewer */}
+      {/* Left Panel - PDF Viewer */}
       <Box flex="1" bg="white" borderRadius="lg" boxShadow="sm" overflow="hidden" position="relative">
         {/* Toolbar */}
         <Box p={2} bg="gray.50" borderBottom="1px solid" borderColor="gray.200">
@@ -435,61 +271,148 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
                   <Spinner size="lg" color="blue.500" />
                   <Text>Loading PDF...</Text>
                 </VStack>
-              </Box>
-            )}
+            </Box>
+          )}
           </Box>
         </Box>
       </Box>
 
-      {/* Right Panel - Rubric */}
+      {/* Right Panel - Question Management */}
       <Box w="300px" bg="white" borderRadius="lg" p={4} boxShadow="sm">
         <VStack align="stretch" gap={4} h="100%">
+          {/* Header */}
           <Text fontSize="lg" fontWeight="bold" color="gray.800">
-            روبریک
+            مدیریت سوالات
           </Text>
 
-          <VStack align="stretch" gap={2} flex="1" overflowY="auto">
-            {rubricItems.map((item, index) => (
+          {/* Total Points */}
+          <Box bg="blue.50" p={3} borderRadius="md">
+            <Text fontSize="sm" color="blue.600" fontWeight="medium">
+              مجموع نمرات: {totalPoints}
+              </Text>
+          </Box>
+
+          {/* Add Question Form */}
+          {isAddingQuestion ? (
+            <VStack align="stretch" gap={3} p={3} bg="gray.50" borderRadius="md">
+              <Text fontSize="sm" fontWeight="medium" color="gray.700">
+                افزودن سوال جدید
+              </Text>
+              <input
+                type="text"
+                placeholder="عنوان سوال"
+                value={newQuestionTitle}
+                onChange={(e) => setNewQuestionTitle(e.target.value)}
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                }}
+              />
+              <input
+                type="number"
+                placeholder="نمره"
+                value={newQuestionPoints}
+                onChange={(e) => setNewQuestionPoints(Number(e.target.value))}
+                min="1"
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                }}
+              />
+              <HStack gap={2}>
+                <Button size="sm" colorScheme="blue" onClick={addQuestion}>
+                  <Icon as={FiPlus} mr={1} />
+                  افزودن
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => setIsAddingQuestion(false)}>
+                  <Icon as={FiX} mr={1} />
+                  انصراف
+                </Button>
+              </HStack>
+            </VStack>
+          ) : (
+            <Button
+              colorScheme="blue"
+              variant="outline"
+              onClick={() => setIsAddingQuestion(true)}
+            >
+              <Icon as={FiPlus} mr={2} />
+              افزودن سوال
+            </Button>
+          )}
+
+          {/* Questions List */}
+          <VStack align="stretch" gap={1} flex="1" overflowY="auto">
+            {questions.map((question, index) => (
               <Box
-                key={item.id}
-                p={3}
-                bg={item.applied ? "green.50" : "gray.50"}
-                borderRadius="md"
+                key={question.id}
+                p={2}
+                bg={question.pageNumber ? "blue.50" : "gray.50"}
+                borderRadius="sm"
                 border="1px solid"
-                borderColor={item.applied ? "green.200" : "gray.200"}
-                cursor="pointer"
-                onClick={() => applyRubricItem(item.id)}
-                _hover={{ bg: item.applied ? "green.100" : "gray.100" }}
+                borderColor={question.pageNumber ? "blue.200" : "gray.200"}
+                _hover={{ bg: question.pageNumber ? "blue.100" : "gray.100" }}
               >
-                <VStack align="stretch" gap={1}>
-                  <HStack justify="space-between">
-                    <Text fontSize="sm" fontWeight="medium" color="gray.800">
-                      {item.title}
+                <HStack justify="space-between" align="center" gap={2}>
+                  <HStack gap={2} flex="1">
+                    <Text fontSize="xs" fontWeight="medium" color="gray.600" minW="40px">
+                      {index + 1}.
                     </Text>
-                    <Text fontSize="sm" color={item.points >= 0 ? "green.600" : "red.600"} fontWeight="bold">
-                      {item.points > 0 ? '+' : ''}{item.points}
+                    <Text fontSize="xs" color="gray.700" flex="1" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
+                      {question.title}
                     </Text>
+                    <Text fontSize="xs" color="blue.600" fontWeight="medium" minW="50px">
+                      {question.points} نمره
+                    </Text>
+                    {question.pageNumber && (
+                      <Text fontSize="xs" color="gray.500" minW="60px">
+                        صفحه {question.pageNumber}
+              </Text>
+                    )}
                   </HStack>
-                  {item.description && (
-                    <Text fontSize="xs" color="gray.600">
-                      {item.description}
-                    </Text>
-                  )}
-                  <Text fontSize="xs" color="blue.500">
-                    کلید: {index + 1}
-                  </Text>
-                </VStack>
-              </Box>
+                  <Button
+                    size="xs"
+                    colorScheme="red"
+                    variant="ghost"
+                    onClick={() => removeQuestion(question.id)}
+                    minW="auto"
+                    p={0}
+                    h="auto"
+                  >
+                    <Icon as={FiX} />
+                  </Button>
+                </HStack>
+        </Box>
             ))}
           </VStack>
 
-          <Box bg="green.50" p={3} borderRadius="md">
-            <Text fontSize="sm" color="green.600" fontWeight="medium">
-              نمره کل: {appliedRubricPoints}
-            </Text>
-          </Box>
-        </VStack>
-      </Box>
+          {/* Action Buttons */}
+          <VStack gap={2}>
+            <Button
+              colorScheme="blue"
+              w="100%"
+              onClick={onSaveOutline}
+              loading={isSaving}
+              loadingText="در حال ذخیره..."
+            >
+              <Icon as={FiSave} mr={2} />
+              ذخیره طرح کلی
+            </Button>
+            <Button
+              variant="outline"
+          w="100%"
+              onClick={onCancel}
+            >
+              انصراف
+            </Button>
+          </VStack>
+          </VStack>
+        </Box>
+      
     </Box>
   );
 };

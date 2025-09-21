@@ -41,6 +41,8 @@ const UploadSubmissionModal: React.FC<UploadSubmissionModalProps> = ({
   const borderColor = useColorModeValue("gray.200", "gray.600");
   const infoBg = useColorModeValue("blue.50", "blue.900");
   const infoText = useColorModeValue("blue.700", "blue.200");
+  const infoBorderColor = useColorModeValue("blue.200", "blue.700");
+  const hoverBg = useColorModeValue("blue.50", "blue.900");
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -110,7 +112,7 @@ const UploadSubmissionModal: React.FC<UploadSubmissionModalProps> = ({
               p={3}
               borderRadius="md"
               border="1px solid"
-              borderColor={useColorModeValue("blue.200", "blue.700")}
+              borderColor={infoBorderColor}
             >
               <HStack align="start" gap={2}>
                 <Icon as={FiInfo} color={infoText} mt={0.5} />
@@ -164,7 +166,7 @@ const UploadSubmissionModal: React.FC<UploadSubmissionModalProps> = ({
                 p={4}
                 textAlign="center"
                 cursor="pointer"
-                _hover={{ borderColor: "blue.400", bg: useColorModeValue("blue.50", "blue.900") }}
+                _hover={{ borderColor: "blue.400", bg: hoverBg }}
                 onClick={() => document.getElementById('file-input')?.click()}
               >
                 <VStack gap={2}>

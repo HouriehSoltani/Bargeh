@@ -3,15 +3,15 @@ import { api } from './api';
 export interface Question {
   id?: number;
   title: string;
-  points: number;
-  order: number;
+  max_points: number; // Backend uses max_points
+  order_index: number; // Backend uses order_index
   default_page_numbers?: number[];
 }
 
 export interface QuestionCreateData {
   title: string;
-  points: number;
-  order: number;
+  max_points: number; // Backend uses max_points
+  order_index: number; // Backend uses order_index
   default_page_numbers?: number[];
 }
 
@@ -32,24 +32,35 @@ export const questionService = {
   // Update questions for an assignment
   async updateQuestions(assignmentId: number, questions: Question[]): Promise<Question[]> {
     try {
+      console.log('Sending update request to:', `/api/assignments/${assignmentId}/questions/update/`);
+      console.log('Request payload:', { questions });
+      
       const response = await api.put(`/api/assignments/${assignmentId}/questions/update/`, {
         questions
       });
-      return (response as any).data;
+      
+      console.log('Update response:', response);
+      return response; // API service already extracts .data
     } catch (error: any) {
       console.error('Error updating questions:', error);
-      throw new Error('Failed to update questions');
+      console.error('Error response:', error.response?.data);
+      throw new Error(`Failed to update questions: ${error.response?.data?.error || error.message}`);
     }
   },
 
   // Get questions for an assignment
   async getQuestions(assignmentId: number): Promise<Question[]> {
     try {
+      console.log('Fetching questions from:', `/api/assignments/${assignmentId}/questions/`);
+      
       const response = await api.get(`/api/assignments/${assignmentId}/questions/`);
-      return (response as any).data;
-    } catch (error) {
+      
+      console.log('Get questions response:', response);
+      return response; // API service already extracts .data
+    } catch (error: any) {
       console.error('Error fetching questions:', error);
-      throw new Error('Failed to fetch questions');
+      console.error('Error response:', error.response?.data);
+      throw new Error(`Failed to fetch questions: ${error.response?.data?.error || error.message}`);
     }
   },
 
