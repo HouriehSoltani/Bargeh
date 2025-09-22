@@ -239,11 +239,11 @@ const AssignmentsPage = () => {
                           <Box as="td" p={3} color={textColor}>
                             {assignment.total_submissions || 0}
                           </Box>
-                          <Box as="td" p={3}>
+                          <Box as="td" p={2}>
                             <VStack align="start" gap={1}>
                               <Box
-                                width="150px"
-                                height="10px"
+                                width="250px"
+                                height="12px"
                                 bg={progressBg}
                                 borderRadius="md"
                                 position="relative"

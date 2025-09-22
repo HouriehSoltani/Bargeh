@@ -270,7 +270,7 @@ const SubmissionPDFViewer: React.FC<SubmissionPDFViewerProps> = ({
       </Box>
 
       {/* Right Panel - Question Page Mapping */}
-      <Box w="400px" bg="white" borderRadius="lg" p={4} boxShadow="sm">
+      <Box w="400px" bg="gray.100" borderRadius="lg" p={4} boxShadow="md">
         <VStack align="stretch" gap={4} h="100%">
           {/* Header */}
           <Text fontSize="lg" fontWeight="bold" color="gray.800">
@@ -410,7 +410,9 @@ const SubmissionPDFViewer: React.FC<SubmissionPDFViewerProps> = ({
           {/* Action Buttons */}
           <VStack gap={2}>
             <Button
-              colorScheme="blue"
+              bg="blue.500"
+              color="white"
+              _hover={{ bg: "blue.600" }}
               w="100%"
               onClick={onSave}
               loading={isSaving}
@@ -419,7 +421,8 @@ const SubmissionPDFViewer: React.FC<SubmissionPDFViewerProps> = ({
               ذخیره طرح کلی
             </Button>
             <Button
-              variant="outline"
+              bg="gray.700"
+              _hover={{ bg: "gray.800" }}
               w="100%"
               onClick={onCancel}
             >

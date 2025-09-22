@@ -247,27 +247,27 @@ const CoursePage = () => {
                             {assignment.due_at ? new Date(assignment.due_at).toLocaleDateString('fa-IR') : 'تعیین نشده'}
                           </Box>
                           <Box as="td" p={3} color={textColor}>
-                            {assignment.total_submissions || 0}
+                            {(assignment as any).total_submissions || 0}
                           </Box>
-                          <Box as="td" p={3}>
+                          <Box as="td" p={2}>
                             <VStack align="start" gap={1}>
                               <Box
-                                width="150px"
-                                height="10px"
+                                width="250px"
+                                height="12px"
                                 bg={progressBg}
                                 borderRadius="md"
                                 position="relative"
                                 overflow="hidden"
                               >
                                 <Box
-                                  width={`${assignment.grading_progress || 0}%`}
+                                  width={`${(assignment as any).grading_progress || 0}%`}
                                   height="100%"
-                                  bg={assignment.grading_progress === 100 ? "green.500" : assignment.grading_progress > 0 ? "blue.500" : "gray.500"}
+                                  bg={(assignment as any).grading_progress === 100 ? "green.500" : (assignment as any).grading_progress > 0 ? "blue.500" : "gray.500"}
                                   borderRadius="md"
                                 />
                               </Box>
                               <Text fontSize="xs" color={subtleText}>
-                                {assignment.grading_progress || 0}%
+                                {(assignment as any).grading_progress || 0}%
                               </Text>
                             </VStack>
                           </Box>

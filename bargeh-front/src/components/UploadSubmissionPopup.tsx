@@ -175,6 +175,7 @@ const UploadSubmissionModal: React.FC<UploadSubmissionModalProps> = ({
                     {fileName || 'لطفاً فایل را انتخاب کنید'}
                   </Text>
                   <Button
+                    paddingX={4}
                     size="sm"
                     bg="#2E5BBA"
                     color="white"
@@ -200,6 +201,7 @@ const UploadSubmissionModal: React.FC<UploadSubmissionModalProps> = ({
         <Box p={6} borderTop="1px solid" borderColor={borderColor}>
           <HStack justify="flex-end" gap={3}>
             <Button
+              paddingX={4}
               variant="outline"
               onClick={handleClose}
               disabled={isUploading}
@@ -209,6 +211,7 @@ const UploadSubmissionModal: React.FC<UploadSubmissionModalProps> = ({
               انصراف
             </Button>
             <Button
+              paddingX={4}
               bg="#2E5BBA"
               color="white"
               _hover={{ bg: "#1E4A9A" }}

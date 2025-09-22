@@ -536,11 +536,11 @@ const ManageSubmissionsPage = () => {
                           <Box as="td" p={3} color={subtleText}>
                             {new Date(submission.created_at).toLocaleDateString('fa-IR')}
                           </Box>
-                          <Box as="td" p={3}>
+                          <Box as="td" p={2}>
                             <VStack align="start" gap={1}>
                               <Box
-                                width="150px"
-                                height="10px"
+                                width="250px"
+                                height="12px"
                                 bg={progressBg}
                                 borderRadius="md"
                                 position="relative"

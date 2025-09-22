@@ -278,7 +278,7 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
       </Box>
 
       {/* Right Panel - Question Management */}
-      <Box w="300px" bg="white" borderRadius="lg" p={4} boxShadow="sm">
+      <Box w="300px" bg="gray.100" borderRadius="lg" p={4} boxShadow="sm">
         <VStack align="stretch" gap={4} h="100%">
           {/* Header */}
           <Text fontSize="lg" fontWeight="bold" color="gray.800">
@@ -286,7 +286,7 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
           </Text>
 
           {/* Total Points */}
-          <Box bg="blue.50" p={3} borderRadius="md">
+          <Box bg="blue.100" p={3} borderRadius="md" border="1px solid" borderColor="blue.200" boxShadow="sm">
             <Text fontSize="sm" color="blue.600" fontWeight="medium">
               مجموع نمرات: {totalPoints}
               </Text>
@@ -294,7 +294,7 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
 
           {/* Add Question Form */}
           {isAddingQuestion ? (
-            <VStack align="stretch" gap={3} p={3} bg="gray.50" borderRadius="md">
+            <VStack align="stretch" gap={3} p={3} bg="white" borderRadius="md" border="1px solid" borderColor="gray.200" boxShadow="sm">
               <Text fontSize="sm" fontWeight="medium" color="gray.700">
                 افزودن سوال جدید
               </Text>
@@ -324,11 +324,11 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
                 }}
               />
               <HStack gap={2}>
-                <Button size="sm" colorScheme="blue" onClick={addQuestion}>
+                <Button paddingLeft={2} size="xs" bg="blue.500" color="white" _hover={{ bg: "blue.600" }} onClick={addQuestion}>
                   <Icon as={FiPlus} mr={1} />
                   افزودن
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => setIsAddingQuestion(false)}>
+                <Button paddingLeft={2} size="xs" bg="gray.700" _hover={{ bg: "gray.800" }} onClick={() => setIsAddingQuestion(false)}>
                   <Icon as={FiX} mr={1} />
                   انصراف
                 </Button>
@@ -336,7 +336,7 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
             </VStack>
           ) : (
             <Button
-              colorScheme="blue"
+              bg='white'
               variant="outline"
               onClick={() => setIsAddingQuestion(true)}
             >
@@ -351,11 +351,12 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
               <Box
                 key={question.id}
                 p={2}
-                bg={question.pageNumber ? "blue.50" : "gray.50"}
+                bg={question.pageNumber ? "blue.100" : "white"}
                 borderRadius="sm"
                 border="1px solid"
-                borderColor={question.pageNumber ? "blue.200" : "gray.200"}
-                _hover={{ bg: question.pageNumber ? "blue.100" : "gray.100" }}
+                borderColor={question.pageNumber ? "blue.300" : "gray.300"}
+                _hover={{ bg: question.pageNumber ? "blue.200" : "gray.50" }}
+                boxShadow="sm"
               >
                 <HStack justify="space-between" align="center" gap={2}>
                   <HStack gap={2} flex="1">
@@ -393,7 +394,9 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
           {/* Action Buttons */}
           <VStack gap={2}>
             <Button
-              colorScheme="blue"
+              bg="blue.500"
+              color="white"
+              _hover={{ bg: "blue.600" }}
               w="100%"
               onClick={onSaveOutline}
               loading={isSaving}
@@ -403,8 +406,9 @@ const GradescopePDFViewer: React.FC<GradescopePDFViewerProps> = ({
               ذخیره طرح کلی
             </Button>
             <Button
-              variant="outline"
-          w="100%"
+                  bg="gray.700"
+                  _hover={{ bg: "gray.800" }}
+              w="100%"
               onClick={onCancel}
             >
               انصراف

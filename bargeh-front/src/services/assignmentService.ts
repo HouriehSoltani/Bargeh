@@ -21,7 +21,9 @@ export const assignmentService = {
             regrade_enabled: true, // ON - created with regrade enabled
             created_at: "2024-01-01T00:00:00Z",
             course: courseId,
-            template_pdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+            template_pdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+            total_submissions: 15,
+            grading_progress: 80
           },
           {
             id: 2,
@@ -32,7 +34,9 @@ export const assignmentService = {
             is_published: false,
             regrade_enabled: false, // OFF - created with regrade disabled
             created_at: "2024-01-02T00:00:00Z",
-            course: courseId
+            course: courseId,
+            total_submissions: 8,
+            grading_progress: 25
           },
           {
             id: 3,
@@ -43,7 +47,9 @@ export const assignmentService = {
             is_published: true,
             regrade_enabled: true, // ON - created with regrade enabled
             created_at: "2024-01-03T00:00:00Z",
-            course: courseId
+            course: courseId,
+            total_submissions: 22,
+            grading_progress: 100
           },
           {
             id: 4,
@@ -54,7 +60,9 @@ export const assignmentService = {
             is_published: true,
             regrade_enabled: false, // OFF - created with regrade disabled
             created_at: "2024-01-04T00:00:00Z",
-            course: courseId
+            course: courseId,
+            total_submissions: 5,
+            grading_progress: 0
           }
         ],
         count: 4
@@ -111,6 +119,7 @@ export const assignmentService = {
                            key === 'dueAt' ? 'due_at' :
                            key === 'uploadByStudent' ? 'upload_by_student' :
                            key === 'anonymizedGrading' ? 'anonymized_grading' :
+                           key === 'totalPoints' ? 'total_points' :
                            key;
           
           // Convert uploadByStudent from string to boolean

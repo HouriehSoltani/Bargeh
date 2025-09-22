@@ -363,9 +363,11 @@ const RosterPage = () => {
                 borderColor={borderColor}
                 borderRadius="md"
                 overflow="hidden"
+                maxH="calc(100vh - 300px)"
+                overflowY="auto"
               >
                 <Table.Root>
-                  <Table.Header bg={headerBg}>
+                  <Table.Header bg={headerBg} position="sticky" top={0} zIndex={10}>
                     <Table.Row>
                       <Table.ColumnHeader 
                         cursor="pointer" 

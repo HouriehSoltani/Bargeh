@@ -36,6 +36,7 @@ interface FormData {
   uploadByStudent: 'student' | 'instructor';
   dueAt: string;
   regradeEnabled: boolean;
+  totalPoints: number;
 }
 
 const assignmentTypes: AssignmentType[] = [
@@ -85,7 +86,8 @@ const CreateAssignmentMerged = () => {
     anonymizedGrading: false,
     uploadByStudent: 'student',
     dueAt: '',
-    regradeEnabled: true
+    regradeEnabled: true,
+    totalPoints: 100
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -127,6 +129,10 @@ const CreateAssignmentMerged = () => {
 
     if (!formData.templatePdf) {
       errors.templatePdf = 'فایل تکلیف الزامی است';
+    }
+
+    if (!formData.totalPoints || formData.totalPoints <= 0) {
+      errors.totalPoints = 'نمره کل باید بیشتر از صفر باشد';
     }
 
     // Only require deadline when student uploads
@@ -381,6 +387,31 @@ const CreateAssignmentMerged = () => {
                     />
                     {validationErrors.title && (
                       <Text color="red.500" fontSize="sm">{validationErrors.title}</Text>
+                    )}
+                  </VStack>
+
+                  {/* Total Points */}
+                  <VStack align="stretch" gap={2}>
+                    <Text fontWeight="medium" color={textColor}>نمره کل *</Text>
+                    <Input
+                      type="number"
+                      value={formData.totalPoints}
+                      onChange={(e) => handleInputChange('totalPoints', parseInt(e.target.value) || 0)}
+                      placeholder="نمره کل تکلیف را وارد کنید"
+                      color={textColor}
+                      size="sm"
+                      fontSize="sm"
+                      bg={inputBg}
+                      border="1px solid"
+                      borderColor={inputBorder}
+                      borderRadius="md"
+                      _placeholder={{ pr: 2, fontSize: "sm" }}
+                      _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px #3182ce' }}
+                      min="1"
+                      step="0.01"
+                    />
+                    {validationErrors.totalPoints && (
+                      <Text color="red.500" fontSize="sm">{validationErrors.totalPoints}</Text>
                     )}
                   </VStack>
 

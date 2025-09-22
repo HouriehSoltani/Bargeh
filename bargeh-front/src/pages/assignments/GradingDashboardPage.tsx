@@ -252,11 +252,11 @@ const GradingDashboardPage = () => {
                           <Box as="td" p={3} color={textColor} fontWeight="medium">
                             {stat.points}
                           </Box>
-                          <Box as="td" p={3}>
+                          <Box as="td" p={2}>
                             <VStack align="start" gap={1}>
                               <Box
-                                width="150px"
-                                height="10px"
+                                width="250px"
+                                height="12px"
                                 bg={progressBg}
                                 borderRadius="md"
                                 position="relative"

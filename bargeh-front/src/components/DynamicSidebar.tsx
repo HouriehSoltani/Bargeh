@@ -202,7 +202,7 @@ const DynamicSidebar = ({
                     </Box>
                   </HStack>
                   <VStack align="start" gap={0} flex={1}>
-                    <Text fontSize="xs" fontWeight="bold" color={userMenuText}>
+                    <Text fontSize="md" fontWeight="bold" color={userMenuText}>
                       {user.name || user.email}
                     </Text>
                     <Text fontSize="xs" color={userMenuSubtext}>

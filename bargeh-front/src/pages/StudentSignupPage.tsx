@@ -69,7 +69,7 @@ const StudentSignupPage: React.FC = () => {
           {/* Header */}
           <VStack gap={2}>
             <Heading size="lg" color={textColor} textAlign="center">
-              ثبت‌نام دانشجو
+              ثبت‌نام 
             </Heading>
             <Text fontSize="sm" color="gray.500" textAlign="center">
               فقط دانشجویان می‌توانند ثبت‌نام کنند

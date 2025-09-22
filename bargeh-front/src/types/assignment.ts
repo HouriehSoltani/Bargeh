@@ -9,6 +9,8 @@ export interface Assignment {
   created_at: string;
   course: number;
   template_pdf?: string; // URL to the PDF file
+  total_submissions?: number; // Number of submissions received
+  grading_progress?: number; // Percentage of grading completed
 }
 
 export interface AssignmentResponse {
