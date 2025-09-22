@@ -230,7 +230,10 @@ const ManageSubmissionsPage = () => {
           created_at: new Date().toISOString(),
           mapping_status: 'incomplete',
           file: '/media/test.pdf',
-          num_pages: 5
+          num_pages: 5,
+          grading_progress: 0,
+          total_questions: 0,
+          graded_questions: 0
         };
         setSubmissions([mockSubmission]);
       } else {
@@ -536,8 +539,8 @@ const ManageSubmissionsPage = () => {
                           <Box as="td" p={3}>
                             <VStack align="start" gap={1}>
                               <Box
-                                width="100px"
-                                height="6px"
+                                width="150px"
+                                height="10px"
                                 bg={progressBg}
                                 borderRadius="md"
                                 position="relative"

@@ -542,7 +542,7 @@ const SubmissionGradingPage: React.FC = () => {
                     </HStack>
                     <Box
                       w="full"
-                      h="8px"
+                      h="12px"
                       bg={progressBg}
                       borderRadius="md"
                       overflow="hidden"

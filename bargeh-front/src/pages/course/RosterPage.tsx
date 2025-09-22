@@ -124,9 +124,8 @@ const RosterPage = () => {
           bValue = b.role;
           break;
         case 'submissions':
-          // For now, we'll use a placeholder value
-          aValue = 0;
-          bValue = 0;
+          aValue = a.submission_count || 0;
+          bValue = b.submission_count || 0;
           break;
         default:
           aValue = getFullName(a);
@@ -466,7 +465,7 @@ const RosterPage = () => {
                             fontSize="sm"
                             color={membership.role === 'instructor' ? subtleText : textColor}
                           >
-                            0
+                            {membership.submission_count || 0}
                           </Text>
                         </Table.Cell>
                         <Table.Cell py={4} px={6}>

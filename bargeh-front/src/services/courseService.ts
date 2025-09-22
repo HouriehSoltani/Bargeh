@@ -54,6 +54,7 @@ export interface CourseMembership {
   course: number;
   role: 'instructor' | 'ta' | 'student';
   created_at: string;
+  submission_count: number;
 }
 
 // Course service methods

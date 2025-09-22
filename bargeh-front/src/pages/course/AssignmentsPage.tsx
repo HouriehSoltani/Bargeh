@@ -242,8 +242,8 @@ const AssignmentsPage = () => {
                           <Box as="td" p={3}>
                             <VStack align="start" gap={1}>
                               <Box
-                                width="100px"
-                                height="6px"
+                                width="150px"
+                                height="10px"
                                 bg={progressBg}
                                 borderRadius="md"
                                 position="relative"
