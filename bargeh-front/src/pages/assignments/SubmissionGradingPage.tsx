@@ -72,6 +72,7 @@ const SubmissionGradingPage: React.FC = () => {
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
   const textColor = useColorModeValue('gray.800', 'white');
+  const subtleText = useColorModeValue('gray.600', 'gray.300');
   const progressBg = useColorModeValue('gray.200', 'gray.600');
 
   useEffect(() => {
@@ -250,7 +251,7 @@ const SubmissionGradingPage: React.FC = () => {
   };
 
   const handleRubricItemToggle = async (itemId: number) => {
-    if (!submissionGrade) return;
+    if (!submissionGrade || !gradingData) return;
     
     const currentSelectedIds = submissionGrade.selected_item_ids;
     const isSelected = currentSelectedIds.includes(itemId);
@@ -260,13 +261,16 @@ const SubmissionGradingPage: React.FC = () => {
       ? currentSelectedIds.filter(id => id !== itemId)
       : [...currentSelectedIds, itemId];
     
-    // Calculate new total points
+    // Calculate new total points based on selected rubric items
     const selectedItems = rubricItems.filter(item => newSelectedIds.includes(item.id));
-    const pointsDeduction = selectedItems.reduce((sum, item) => {
-      // For negative rubric items, subtract points; for positive, add points
-      return sum + item.delta_points;
+    const deltaSum = selectedItems.reduce((sum, item) => {
+      // delta_points can be positive or negative
+      return sum + (item.delta_points || 0);
     }, 0);
-    const newTotalPoints = Math.max(0, (gradingData?.question_points || 0) + pointsDeduction);
+    
+    // Calculate new total: base points + delta sum, clamped between 0 and max points
+    const basePoints = gradingData.question_points || 0;
+    const newTotalPoints = Math.max(0, Math.min(basePoints + deltaSum, basePoints));
     
     const optimisticGrade = {
       ...submissionGrade,
@@ -531,32 +535,53 @@ const SubmissionGradingPage: React.FC = () => {
                   </Text>
                   
                   {/* Progress Bar */}
-                  <VStack align="stretch" w="full" gap={1}>
-                    <HStack justify="space-between">
-                      <Text fontSize="sm" color={textColor}>
-                        پیشرفت نمره‌دهی
+                  <VStack align="stretch" w="full" gap={2}>
+                    <HStack justify="space-between" align="center">
+                      <Text fontSize="sm" fontWeight="medium" color={textColor}>
+                        پیشرفت نمره‌دهی سوال
                       </Text>
-                      <Text fontSize="sm" color={textColor}>
-                        {gradingData.graded_submissions}/{gradingData.total_submissions}
+                      <Text fontSize="sm" color={subtleText}>
+                        {gradingData.graded_submissions} از {gradingData.total_submissions}
                       </Text>
                     </HStack>
                     <Box
                       w="full"
-                      h="12px"
+                      h="16px"
                       bg={progressBg}
-                      borderRadius="md"
+                      borderRadius="full"
                       overflow="hidden"
+                      position="relative"
                     >
                       <Box
                         w={`${gradingData.progress_percentage}%`}
                         h="full"
-                        bg="blue.500"
-                        transition="width 0.3s ease"
-                      />
+                        bg={gradingData.progress_percentage === 100 ? "green.500" : gradingData.progress_percentage > 0 ? "blue.500" : "gray.400"}
+                        borderRadius="full"
+                        transition="all 0.3s ease"
+                        position="relative"
+                      >
+                        {/* Progress percentage text overlay */}
+                        {gradingData.progress_percentage > 20 && (
+                          <Text
+                            fontSize="xs"
+                            color="white"
+                            fontWeight="bold"
+                            position="absolute"
+                            top="50%"
+                            left="50%"
+                            transform="translate(-50%, -50%)"
+                            textShadow="0 1px 2px rgba(0,0,0,0.3)"
+                          >
+                            {gradingData.progress_percentage}%
+                          </Text>
+                        )}
+                      </Box>
                     </Box>
-                    <Text fontSize="xs" color={textColor} textAlign="center">
-                      {gradingData.progress_percentage}%
-                    </Text>
+                    {gradingData.progress_percentage <= 20 && (
+                      <Text fontSize="xs" color={subtleText} textAlign="center">
+                        {gradingData.progress_percentage}% تکمیل شده
+                      </Text>
+                    )}
                   </VStack>
 
                   <Box h="1px" bg={borderColor} />
@@ -566,13 +591,38 @@ const SubmissionGradingPage: React.FC = () => {
                     <Text fontSize="md" fontWeight="bold" color="gray.800">
                       نمره کل:
                     </Text>
-                    <HStack gap={1}>
-                      <Text fontSize="lg" fontWeight="medium" color="gray.600">
-                        {submissionGrade?.total_points || gradingData.question_points}
-                      </Text>
-                      <Text fontSize="lg" fontWeight="bold" color="gray.800">
-                        / {gradingData.question_points}
-                      </Text>
+                    <HStack gap={2} align="center">
+                      <HStack gap={1}>
+                        <Text 
+                          fontSize="xl" 
+                          fontWeight="bold" 
+                          color={(submissionGrade?.total_points ?? gradingData.question_points) === gradingData.question_points ? "green.600" : 
+                                 (submissionGrade?.total_points ?? gradingData.question_points) < gradingData.question_points ? "orange.600" : "blue.600"}
+                        >
+                          {submissionGrade?.total_points ?? gradingData.question_points}
+                        </Text>
+                        <Text fontSize="lg" fontWeight="medium" color="gray.600">
+                          / {gradingData.question_points}
+                        </Text>
+                      </HStack>
+                      {(submissionGrade?.total_points ?? gradingData.question_points) !== gradingData.question_points && (
+                        <Box
+                          px={2}
+                          py={1}
+                          borderRadius="md"
+                          bg={(submissionGrade?.total_points ?? gradingData.question_points) < gradingData.question_points ? "orange.100" : "blue.100"}
+                          border="1px solid"
+                          borderColor={(submissionGrade?.total_points ?? gradingData.question_points) < gradingData.question_points ? "orange.300" : "blue.300"}
+                        >
+                          <Text 
+                            fontSize="xs" 
+                            fontWeight="medium" 
+                            color={(submissionGrade?.total_points ?? gradingData.question_points) < gradingData.question_points ? "orange.700" : "blue.700"}
+                          >
+                            {(submissionGrade?.total_points ?? gradingData.question_points) < gradingData.question_points ? "کسر شده" : "اضافه شده"}
+                          </Text>
+                        </Box>
+                      )}
                     </HStack>
                   </VStack>
                 </VStack>
@@ -690,16 +740,33 @@ const SubmissionGradingPage: React.FC = () => {
                               borderColor="gray.200"
                             >
                               <VStack align="start" gap={1}>
-                                <Text 
-                                  fontSize="sm" 
-                                  fontWeight="medium" 
-                                  color={item.delta_points >= 0 ? "green.600" : "red.500"}
-                                >
-                                  {item.delta_points >= 0 ? `+${item.delta_points}` : `${item.delta_points}`}
-                                </Text>
+                                <HStack gap={2} align="center">
+                                  <Box
+                                    px={2}
+                                    py={1}
+                                    borderRadius="md"
+                                    bg={item.delta_points >= 0 ? "green.100" : "red.100"}
+                                    border="1px solid"
+                                    borderColor={item.delta_points >= 0 ? "green.300" : "red.300"}
+                                  >
+                                    <Text 
+                                      fontSize="xs" 
+                                      fontWeight="bold" 
+                                      color={item.delta_points >= 0 ? "green.700" : "red.700"}
+                                    >
+                                      {item.delta_points >= 0 ? `+${item.delta_points}` : `${item.delta_points}`} امتیاز
+                                    </Text>
+                                  </Box>
+                                  {item.delta_points < 0 && (
+                                    <Text fontSize="xs" color="red.500" fontWeight="medium">
+                                      کسر امتیاز
+                                    </Text>
+                                  )}
+                                </HStack>
                                 <Text 
                                   fontSize="sm" 
                                   color="gray.700"
+                                  fontWeight="medium"
                                 >
                                   {item.label}
                                 </Text>

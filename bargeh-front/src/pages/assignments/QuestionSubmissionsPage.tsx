@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -11,8 +11,9 @@ import {
   Heading,
   Spinner,
   Badge,
+  Button,
 } from '@chakra-ui/react';
-import { FiCheck, FiX } from 'react-icons/fi';
+import { FiCheck, FiX, FiArrowLeft } from 'react-icons/fi';
 import { useColorModeValue } from '@/hooks/useColorMode';
 import { useAssignment } from '@/hooks/useAssignment';
 import DynamicSidebar from '@/components/DynamicSidebar';
@@ -46,6 +47,8 @@ const QuestionSubmissionsPage = () => {
   const [submissions, setSubmissions] = useState<QuestionSubmission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [gradingProgress, setGradingProgress] = useState(0);
+  const [nextUngradedSubmission, setNextUngradedSubmission] = useState<QuestionSubmission | null>(null);
 
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
@@ -78,7 +81,26 @@ const QuestionSubmissionsPage = () => {
         const response = await api.get(`/api/assignments/${assignmentId}/questions/${questionId}/submissions/`);
         console.log('Question submissions response:', response);
         
-        setSubmissions((response as any).submissions || []);
+        const submissionsData = (response as any).submissions || [];
+        setSubmissions(submissionsData);
+        
+        // Calculate grading progress for this question
+        const totalSubmissions = submissionsData.length;
+        const gradedSubmissions = submissionsData.filter((sub: QuestionSubmission) => sub.is_graded).length;
+        const progressPercentage = totalSubmissions > 0 ? Math.round((gradedSubmissions / totalSubmissions) * 100) : 0;
+        setGradingProgress(progressPercentage);
+        
+        // Find next ungraded submission
+        const ungradedSubmissions = submissionsData.filter((sub: QuestionSubmission) => !sub.is_graded);
+        if (ungradedSubmissions.length > 0) {
+          // Get the first ungraded submission (by row number)
+          const nextSubmission = ungradedSubmissions.reduce((min: QuestionSubmission, current: QuestionSubmission) => 
+            current.row_number < min.row_number ? current : min
+          );
+          setNextUngradedSubmission(nextSubmission);
+        } else {
+          setNextUngradedSubmission(null);
+        }
       } catch (err: any) {
         console.error('Error loading question submissions:', err);
         setError('خطا در بارگذاری اطلاعات ارسال‌ها');
@@ -89,6 +111,13 @@ const QuestionSubmissionsPage = () => {
 
     loadData();
   }, [assignmentId, questionId]);
+
+  // Handle grade submission navigation
+  const handleGradeSubmission = () => {
+    if (nextUngradedSubmission) {
+      navigate(`/courses/${courseId}/assignments/${assignmentId}/submissions/${nextUngradedSubmission.submission_id}/grade`);
+    }
+  };
 
   // Show loading state
   if (assignmentLoading || isLoading) {
@@ -135,6 +164,7 @@ const QuestionSubmissionsPage = () => {
   }
 
   return (
+    <Fragment>
     <Grid
       templateAreas={{ base: `"main"`, md: `"sidebar main"` }}
       templateColumns={{ base: "1fr", md: "300px 1fr" }}
@@ -248,12 +278,12 @@ const QuestionSubmissionsPage = () => {
                           </Box>
                           <Box as="td" p={3} textAlign="center">
                             {submission.is_graded ? (
-                              <Badge colorScheme="green" variant="solid">
+                              <Badge paddingLeft={2} size="sm" bg="green.500" variant="solid">
                                 <Icon as={FiCheck} mr={1} />
                                 بله
                               </Badge>
                             ) : (
-                              <Badge colorScheme="red" variant="solid">
+                              <Badge paddingLeft={2} size="sm" bg="red.500" variant="solid">
                                 <Icon as={FiX} mr={1} />
                                 خیر
                               </Badge>
@@ -270,6 +300,48 @@ const QuestionSubmissionsPage = () => {
         </VStack>
       </GridItem>
     </Grid>
+    
+    {/* Bottom Action Bar */}
+    <Box
+      position='fixed'
+      bottom={0}
+      left={0}
+      right={0}
+      bg="gray.100"
+      borderTop="1px solid"
+      borderColor="gray.300"
+      p={{ base: 1, md: 2 }}
+      zIndex={10}
+      w="100%"
+    >
+      <HStack justify="space-between" mx="auto" px={{ base: 4, md: 6 }} gap={3}>
+        
+        {/* Progress Text */}
+        <Text 
+          fontSize={{ base: "sm", md: "md" }} 
+          color="gray.700" 
+          fontWeight="medium"
+        >
+          پیشرفت نمره‌دهی سوال: {gradingProgress}%
+        </Text>
+        
+        {/* Grade Submission Button */}
+        <Button
+          paddingRight={2}
+          bg="#2E5BBA"
+          color="white"
+          size={{ base: "sm", md: "md" }}
+          _hover={{ bg: "#1E4A9A" }}
+          fontSize={{ base: "xs", md: "sm" }}
+          onClick={handleGradeSubmission}
+          disabled={!nextUngradedSubmission}
+        >
+          تصحیح
+          <Icon as={FiArrowLeft} mr={2} />
+        </Button>
+      </HStack>
+    </Box>
+    </Fragment>
   );
 };
 
