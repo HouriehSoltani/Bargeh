@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import CoursePage from '@/pages/course/CoursePage';
-import StudentCoursePage from '@/pages/course/StudentCoursePage';
+import StudentAssignmentsPage from '@/pages/course/StudentAssignmentsPage';
 
 const CourseRoleBasedRouter: React.FC = () => {
   const { user, isLoading } = useAuth();
@@ -11,9 +11,9 @@ const CourseRoleBasedRouter: React.FC = () => {
     return <div>Loading...</div>;
   }
 
-  // Students get student course page, instructors get full access
+  // Students get student assignments page, instructors get full access
   if (user?.role === 'student') {
-    return <StudentCoursePage />;
+    return <StudentAssignmentsPage />;
   }
 
   // Instructors get full access to course page

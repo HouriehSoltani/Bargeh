@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -10,8 +10,9 @@ import {
   Icon,
   Heading,
   Spinner,
+  Button,
 } from '@chakra-ui/react';
-import { FiChevronUp } from 'react-icons/fi';
+import { FiChevronUp, FiArrowLeft } from 'react-icons/fi';
 import { useColorModeValue } from '@/hooks/useColorMode';
 import { useAssignment } from '@/hooks/useAssignment';
 import DynamicSidebar from '@/components/DynamicSidebar';
@@ -39,6 +40,8 @@ const GradingDashboardPage = () => {
   const [gradingStats, setGradingStats] = useState<GradingStats[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [overallProgress, setOverallProgress] = useState(0);
+  const [nextUngradedQuestion, setNextUngradedQuestion] = useState<GradingStats | null>(null);
 
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "white");
@@ -92,6 +95,23 @@ const GradingDashboardPage = () => {
 
         const stats = await Promise.all(statsPromises);
         setGradingStats(stats);
+        
+        // Calculate overall progress
+        const totalSubmissions = stats.reduce((sum, stat) => sum + stat.total_submissions, 0);
+        const totalGraded = stats.reduce((sum, stat) => sum + stat.graded_submissions, 0);
+        const overallProgressPercentage = totalSubmissions > 0 ? Math.round((totalGraded / totalSubmissions) * 100) : 0;
+        setOverallProgress(overallProgressPercentage);
+        
+        // Find next ungraded question (lowest progress percentage)
+        const ungradedQuestions = stats.filter(stat => stat.progress_percentage < 100);
+        if (ungradedQuestions.length > 0) {
+          const nextQuestion = ungradedQuestions.reduce((min, current) => 
+            current.progress_percentage < min.progress_percentage ? current : min
+          );
+          setNextUngradedQuestion(nextQuestion);
+        } else {
+          setNextUngradedQuestion(null);
+        }
       } catch (err: any) {
         console.error('Error loading grading data:', err);
         setError('خطا در بارگذاری اطلاعات نمره‌دهی');
@@ -102,6 +122,13 @@ const GradingDashboardPage = () => {
 
     loadGradingData();
   }, [assignmentId]);
+
+  // Handle next question navigation
+  const handleNextQuestion = () => {
+    if (nextUngradedQuestion) {
+      navigate(`/courses/${courseId}/assignments/${assignmentId}/grade/${nextUngradedQuestion.question_id}`);
+    }
+  };
 
   // Show loading state
   if (assignmentLoading || isLoading) {
@@ -148,6 +175,7 @@ const GradingDashboardPage = () => {
   }
 
   return (
+    <Fragment>
     <Grid
       templateAreas={{ base: `"main"`, md: `"sidebar main"` }}
       templateColumns={{ base: "1fr", md: "300px 1fr" }}
@@ -288,6 +316,50 @@ const GradingDashboardPage = () => {
         </VStack>
       </GridItem>
     </Grid>
+    
+    {/* Bottom Action Bar */}
+    <Box
+      position='fixed'
+      bottom={0}
+      left={0}
+      right={0}
+      bg="gray.100"
+      borderTop="1px solid"
+      borderColor="gray.300"
+      p={{ base: 1, md: 2 }}
+      zIndex={10}
+      w="100%"
+    >
+      <HStack justify="space-between" mx="auto" px={{ base: 4, md: 6 }} gap={3}>
+        
+        
+        {/* Progress Text */}
+        <Text 
+          fontSize={{ base: "sm", md: "md" }} 
+          color="gray.700" 
+          fontWeight="medium"
+        >
+          پیشرفت نمره‌دهی تکلیف: {overallProgress}%
+          </Text>
+          
+          {/* Next Question Button */}
+          <Button
+            paddingRight={2}
+          bg="#2E5BBA"
+          color="white"
+          size={{ base: "sm", md: "md" }}
+          paddingLeft={2}
+          _hover={{ bg: "#1E4A9A" }}
+          fontSize={{ base: "xs", md: "sm" }}
+          onClick={handleNextQuestion}
+          disabled={!nextUngradedQuestion}
+        >
+          سوال بعدی
+          <Icon as={FiArrowLeft} mr={2} />
+        </Button>
+      </HStack>
+    </Box>
+    </Fragment>
   );
 };
 

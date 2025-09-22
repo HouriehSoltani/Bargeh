@@ -13,6 +13,7 @@ import SubmissionOutlinePage from "./pages/assignments/SubmissionOutlinePage";
 import GradingDashboardPage from "./pages/assignments/GradingDashboardPage";
 import QuestionSubmissionsPage from "./pages/assignments/QuestionSubmissionsPage";
 import SubmissionGradingPage from "./pages/assignments/SubmissionGradingPage";
+import StudentSubmissionPage from "./pages/course/StudentSubmissionPage";
 import ProfilePage from "./pages/ProfilePage";
 import { RequireAuth } from "./components/RequireAuth";
 import RoleBasedRouter from "./components/RoleBasedRouter";
@@ -68,6 +69,10 @@ const router = createBrowserRouter([
              {
                path: "courses/:courseId/assignments/:assignmentId/questions/:questionId/submissions/:submissionId/grade",
                element: <SubmissionGradingPage />
+             },
+             {
+               path: "courses/:courseId/assignments/:assignmentId/submit",
+               element: <StudentSubmissionPage />
              },
       { 
         path: "courses/:courseId/roster", 

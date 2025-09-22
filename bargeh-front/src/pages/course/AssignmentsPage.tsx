@@ -252,7 +252,7 @@ const AssignmentsPage = () => {
                                 <Box
                                   width={`${assignment.grading_progress || 0}%`}
                                   height="100%"
-                                  bg={assignment.grading_progress === 100 ? "green.500" : assignment.grading_progress > 0 ? "blue.500" : "gray.500"}
+                                  bg={(assignment.grading_progress || 0) === 100 ? "green.500" : (assignment.grading_progress || 0) > 0 ? "blue.500" : "gray.500"}
                                   borderRadius="md"
                                 />
                               </Box>
