@@ -99,7 +99,7 @@ export const getAssignmentNavigationConfig = (courseId: string, assignmentId: st
           { icon: FiEdit3, label: "طرح کلی", href: `/courses/${courseId}/assignments/${assignmentId}/outline`, path: `/courses/${courseId}/assignments/${assignmentId}/outline` },
           { icon: FiUpload, label: "مدیریت ارسال‌ها", href: `/courses/${courseId}/assignments/${assignmentId}/submissions`, path: `/courses/${courseId}/assignments/${assignmentId}/submissions` },
           { icon: FiCheckSquare, label: "نمره‌دهی", href: `/courses/${courseId}/assignments/${assignmentId}/grade`, path: `/courses/${courseId}/assignments/${assignmentId}/grade` },
-          { icon: FiBarChart, label: "بررسی نمرات", href: `/courses/${courseId}/assignments/${assignmentId}/grades`, path: `/courses/${courseId}/assignments/${assignmentId}/grades` },
+          { icon: FiBarChart, label: "بررسی نمرات", href: `/courses/${courseId}/assignments/${assignmentId}/review-grades`, path: `/courses/${courseId}/assignments/${assignmentId}/review-grades` },
         ]
       },
       {
@@ -115,8 +115,8 @@ export const getAssignmentNavigationConfig = (courseId: string, assignmentId: st
 
 // Function to get navigation config based on user role (simplified)
 export const getNavigationConfig = (pathname: string, courseId?: string, userRole?: 'instructor' | 'student', courseTitle?: string, assignmentTitle?: string): SidebarConfig => {
-  // Check if this is an assignment page (outline, submissions, grade, or questions)
-  const assignmentMatch = pathname.match(/^\/courses\/(\d+)\/assignments\/(\d+)\/(outline|submissions|grade|questions)/);
+  // Check if this is an assignment page (outline, submissions, grade, questions, or review-grades)
+  const assignmentMatch = pathname.match(/^\/courses\/(\d+)\/assignments\/(\d+)\/(outline|submissions|grade|questions|review-grades)/);
   if (assignmentMatch) {
     const [, courseId, assignmentId] = assignmentMatch;
     return getAssignmentNavigationConfig(courseId, assignmentId, courseTitle, assignmentTitle);

@@ -53,7 +53,7 @@ const DynamicSidebar = ({
   const location = useLocation();
   
   // Get assignment data if we're on an assignment page
-  const assignmentMatch = location.pathname.match(/^\/courses\/(\d+)\/assignments\/(\d+)\/(outline|submissions|grade|questions)/);
+  const assignmentMatch = location.pathname.match(/^\/courses\/(\d+)\/assignments\/(\d+)\/(outline|submissions|grade|questions|review-grades)/);
   const assignmentId = assignmentMatch ? assignmentMatch[2] : undefined;
   const { assignment } = useAssignment(assignmentId);
   const { user, isAuthenticated, logout } = useAuth();

@@ -14,7 +14,7 @@ import {
   Menu
 } from "@chakra-ui/react";
 import { useColorModeValue } from "@/hooks/useColorMode";
-import { FiChevronUp, FiChevronDown, FiMoreVertical, FiPlus, FiCheck, FiSettings, FiTrash2 } from "react-icons/fi";
+import { FiChevronUp, FiChevronDown, FiMoreVertical, FiPlus, FiCheck, FiSettings, FiTrash2, FiBarChart } from "react-icons/fi";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCourse } from "@/hooks/useCourse";
 import { useAssignments } from "@/hooks/useAssignments";
@@ -36,6 +36,10 @@ const AssignmentsPage = () => {
   // Handler functions
   const handleAssignmentSettings = (assignmentId: number) => {
     navigate(`/courses/${courseId}/assignments/${assignmentId}/settings`);
+  };
+
+  const handleReviewGrades = (assignmentId: number) => {
+    navigate(`/courses/${courseId}/assignments/${assignmentId}/review-grades`);
   };
 
   const handleDeleteAssignment = (assignmentId: number) => {
@@ -311,6 +315,22 @@ const AssignmentsPage = () => {
                                 position="absolute"
                                 left={0}
                               >
+                                <Menu.Item 
+                                  value="review-grades"
+                                  onClick={() => handleReviewGrades(assignment.id)}
+                                  bg="transparent"
+                                  cursor="pointer"
+                                  _hover={{ bg: menuItemHoverBlue }}
+                                  _focus={{ bg: menuItemHoverBlue }}
+                                  py={2}
+                                  px={3}
+                                  fontSize="sm"
+                                >
+                                  <HStack w="full">
+                                    <Icon as={FiBarChart} color="blue.500" />
+                                    <Text color="blue.500">بررسی نمرات</Text>
+                                  </HStack>
+                                </Menu.Item>
                                 <Menu.Item 
                                   value="settings"
                                   onClick={() => handleAssignmentSettings(assignment.id)}
