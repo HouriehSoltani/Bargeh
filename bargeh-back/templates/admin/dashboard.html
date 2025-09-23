@@ -1,0 +1,136 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}Bargeh Dashboard{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <style>
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        .recent-items {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        .recent-card {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .recent-card h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .recent-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        .recent-item:last-child {
+            border-bottom: none;
+        }
+        .recent-item a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .recent-item a:hover {
+            text-decoration: underline;
+        }
+        .recent-meta {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h1>Bargeh Course Management Dashboard</h1>
+    
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_users }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_courses }}</div>
+            <div class="stat-label">Total Courses</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.active_students }}</div>
+            <div class="stat-label">Active Students</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.instructors }}</div>
+            <div class="stat-label">Instructors</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_assignments }}</div>
+            <div class="stat-label">Assignments</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_submissions }}</div>
+            <div class="stat-label">Submissions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_grades }}</div>
+            <div class="stat-label">Grades</div>
+        </div>
+    </div>
+    
+    <div class="recent-items">
+        <div class="recent-card">
+            <h3>Recent Courses</h3>
+            {% for course in recent_courses %}
+            <div class="recent-item">
+                <a href="{% url 'bargeh_admin:courses_course_change' course.id %}">
+                    {{ course.title }}
+                </a>
+                <div class="recent-meta">
+                    {{ course.code }} • {{ course.instructor.name|default:course.instructor.email }} • {{ course.created_at|date:"M d, Y" }}
+                </div>
+            </div>
+            {% empty %}
+            <p>No courses found.</p>
+            {% endfor %}
+        </div>
+        
+        <div class="recent-card">
+            <h3>Recent Submissions</h3>
+            {% for submission in recent_submissions %}
+            <div class="recent-item">
+                <a href="{% url 'bargeh_admin:submissions_submission_change' submission.id %}">
+                    {{ submission.assignment_version.assignment.title }}
+                </a>
+                <div class="recent-meta">
+                    {{ submission.student.name|default:submission.student.email }} • {{ submission.status }} • {{ submission.submitted_at|date:"M d, Y H:i" }}
+                </div>
+            </div>
+            {% empty %}
+            <p>No submissions found.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

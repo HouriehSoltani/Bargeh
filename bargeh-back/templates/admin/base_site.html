@@ -1,0 +1,59 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        <!-- <img src="{% static 'admin/img/icon-bargeh.svg' %}" alt="Bargeh" style="height: 20px; margin-right: 10px;"> -->
+        {{ site_header|default:_('Django administration') }}
+    </a>
+</h1>
+{% endblock %}
+
+{% block nav-breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    {% if title %} &rsaquo; {{ title }}{% endif %}
+</div>
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <!-- <style>
+        #site-name a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        #site-name a:hover {
+            color: #0056b3;
+        }
+        .module h2, .module caption, .inline-group h2 {
+            background: #007bff;
+            color: white;
+        }
+        .module h2 a, .module caption a, .inline-group h2 a {
+            color: white;
+        }
+        .module h2 a:hover, .module caption a:hover, .inline-group h2 a:hover {
+            color: #e6f3ff;
+        }
+        .button, input[type=submit], input[type=button], .submit-row input, a.button {
+            background: #007bff;
+            border: 1px solid #007bff;
+        }
+        .button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
+            background: #0056b3;
+            border: 1px solid #0056b3;
+        }
+        .button.default, input[type=submit].default, .submit-row input.default {
+            background: #28a745;
+            border: 1px solid #28a745;
+        }
+        .button.default:hover, input[type=submit].default:hover, .submit-row input.default:hover {
+            background: #218838;
+            border: 1px solid #218838;
+        }
+    </style> -->
+{% endblock %}

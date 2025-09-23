@@ -1,0 +1,31 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <!-- <style>
+        .dashboard-link {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .dashboard-link:hover {
+            background: #0056b3;
+            color: white;
+        }
+    </style> -->
+{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <a href="{% url 'admin:dashboard' %}" class="dashboard-link">
+        📊 View Dashboard
+    </a>
+</div>
+
+{{ block.super }}
+{% endblock %}
